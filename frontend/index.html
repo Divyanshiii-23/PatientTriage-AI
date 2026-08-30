@@ -1,0 +1,2353 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PatientTriage.ai - Patient Intake</title>
+    
+    <!-- Chart.js for visualizations -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    
+    <style>
+        /* CSS Variables for ESI Color Scheme */
+        :root {
+            --esi-1-red: #d32f2f;
+            --esi-2-orange: #f57c00;
+            --esi-3-yellow: #fbc02d;
+            --esi-4-green: #388e3c;
+            --esi-5-blue: #1976d2;
+            --bg-light: #f5f5f5;
+            --bg-white: #ffffff;
+            --text-primary: #212121;
+            --text-secondary: #757575;
+            --border-color: #e0e0e0;
+            --shadow: 0 2px 4px rgba(0,0,0,0.1);
+            --shadow-lg: 0 4px 8px rgba(0,0,0,0.15);
+        }
+        
+        /* Global Styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background-color: var(--bg-light);
+            color: var(--text-primary);
+            line-height: 1.6;
+        }
+        
+        /* Navigation Header */
+        .nav-header {
+            background: linear-gradient(135deg, #1976d2 0%, #1565c0 100%);
+            color: white;
+            padding: 0;
+            box-shadow: var(--shadow-lg);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+        
+        .nav-container {
+            max-width: 1800px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 2rem;
+        }
+        
+        .nav-brand {
+            font-size: 1.5rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .nav-subtitle {
+            font-size: 0.85rem;
+            opacity: 0.9;
+            font-weight: 400;
+        }
+        
+        .nav-tabs {
+            display: flex;
+            gap: 0.5rem;
+        }
+        
+        .nav-tab {
+            padding: 0.75rem 1.5rem;
+            background: rgba(255, 255, 255, 0.1);
+            border: none;
+            color: white;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.95rem;
+            font-weight: 500;
+            transition: all 0.2s;
+            text-decoration: none;
+            display: inline-block;
+        }
+        
+        .nav-tab:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+        
+        .nav-tab.active {
+            background: white;
+            color: #1976d2;
+        }
+        
+        /* Main Container Layout */
+        .container {
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+        
+        /* Top Bar - Demo Patient Selector */
+        .top-bar {
+            background-color: var(--bg-white);
+            border-bottom: 2px solid var(--border-color);
+            padding: 1rem 2rem;
+            box-shadow: var(--shadow);
+            z-index: 100;
+        }
+        
+        .top-bar-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1800px;
+            margin: 0 auto;
+        }
+        
+        .top-bar h1 {
+            font-size: 1.5rem;
+            color: var(--text-primary);
+            font-weight: 600;
+        }
+        
+        .demo-selector-section {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        
+        .demo-selector-section label {
+            font-weight: 500;
+            color: var(--text-secondary);
+            white-space: nowrap;
+        }
+        
+        #demo-patient-selector {
+            padding: 0.5rem 1rem;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            font-size: 0.95rem;
+            min-width: 300px;
+            cursor: pointer;
+        }
+        
+        /* Main Content Area */
+        .main-content {
+            display: flex;
+            flex: 1;
+            max-width: 1800px;
+            margin: 0 auto;
+            width: 100%;
+            gap: 1.5rem;
+            padding: 1.5rem;
+        }
+        
+        /* Left Sidebar - Patient Intake Form */
+        .left-sidebar {
+            flex: 1;
+            min-width: 400px;
+            max-width: 500px;
+            background-color: var(--bg-white);
+            border-radius: 8px;
+            box-shadow: var(--shadow-lg);
+            padding: 1.5rem;
+            overflow-y: auto;
+        }
+        
+        .form-section {
+            margin-bottom: 1.5rem;
+        }
+        
+        .form-section h2 {
+            font-size: 1.25rem;
+            margin-bottom: 1rem;
+            color: var(--text-primary);
+            border-bottom: 2px solid var(--border-color);
+            padding-bottom: 0.5rem;
+        }
+        
+        .form-group {
+            margin-bottom: 1rem;
+        }
+        
+        .form-group label {
+            display: block;
+            font-weight: 500;
+            margin-bottom: 0.25rem;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+        
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 0.5rem;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            font-size: 0.95rem;
+            font-family: inherit;
+        }
+        
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: var(--esi-5-blue);
+            box-shadow: 0 0 0 2px rgba(25, 118, 210, 0.1);
+        }
+        
+        .form-group input.error,
+        .form-group select.error {
+            border-color: var(--esi-1-red);
+            background-color: #ffebee;
+        }
+        
+        .form-group input.warning {
+            border-color: var(--esi-3-yellow);
+            background-color: #fffde7;
+        }
+        
+        .form-group textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+        
+        .required-indicator {
+            color: var(--esi-1-red);
+            margin-left: 0.25rem;
+        }
+        
+        .form-row {
+            display: flex;
+            gap: 1rem;
+        }
+        
+        .form-row .form-group {
+            flex: 1;
+        }
+        
+        .submit-btn {
+            width: 100%;
+            padding: 0.75rem;
+            background-color: var(--esi-5-blue);
+            color: white;
+            border: none;
+            border-radius: 4px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        
+        .submit-btn:hover {
+            background-color: #1565c0;
+        }
+        
+        .submit-btn:disabled {
+            background-color: var(--text-secondary);
+            cursor: not-allowed;
+        }
+        
+        /* Right Panel - ML Recommendation Display */
+        .right-panel {
+            flex: 2;
+            min-width: 600px;
+            background-color: var(--bg-white);
+            border-radius: 8px;
+            box-shadow: var(--shadow-lg);
+            padding: 1.5rem;
+            overflow-y: auto;
+        }
+        
+        .recommendation-placeholder {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            color: var(--text-secondary);
+            text-align: center;
+        }
+        
+        .recommendation-placeholder svg {
+            width: 100px;
+            height: 100px;
+            margin-bottom: 1rem;
+            opacity: 0.3;
+        }
+        
+        .recommendation-content {
+            display: none;
+        }
+        
+        .recommendation-content.active {
+            display: block;
+        }
+        
+        .esi-display {
+            text-align: center;
+            padding: 2rem;
+            border-radius: 8px;
+            margin-bottom: 1.5rem;
+        }
+        
+        .esi-display h2 {
+            font-size: 3rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .esi-display p {
+            font-size: 1.25rem;
+            font-weight: 500;
+        }
+        
+        /* ESI Color Classes */
+        .esi-1 {
+            background-color: var(--esi-1-red);
+            color: white;
+        }
+        
+        .esi-2 {
+            background-color: var(--esi-2-orange);
+            color: white;
+        }
+        
+        .esi-3 {
+            background-color: var(--esi-3-yellow);
+            color: var(--text-primary);
+        }
+        
+        .esi-4 {
+            background-color: var(--esi-4-green);
+            color: white;
+        }
+        
+        .esi-5 {
+            background-color: var(--esi-5-blue);
+            color: white;
+        }
+        
+        .result-section {
+            margin-bottom: 1.5rem;
+            padding: 1rem;
+            background-color: var(--bg-light);
+            border-radius: 4px;
+        }
+        
+        .result-section h3 {
+            font-size: 1.1rem;
+            margin-bottom: 0.75rem;
+            color: var(--text-primary);
+        }
+        
+        .chart-container {
+            position: relative;
+            height: 250px;
+            margin-top: 1rem;
+        }
+        
+        .confidence-breakdown {
+            display: grid;
+            gap: 0.75rem;
+        }
+        
+        .confidence-item {
+            display: flex;
+            flex-direction: column;
+            gap: 0.25rem;
+        }
+        
+        .confidence-item-header {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.9rem;
+        }
+        
+        .confidence-bar {
+            height: 8px;
+            background-color: var(--border-color);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+        
+        .confidence-bar-fill {
+            height: 100%;
+            transition: width 0.3s ease;
+        }
+        
+        .safety-flag-banner {
+            padding: 1rem;
+            border-radius: 4px;
+            margin-bottom: 1.5rem;
+            font-weight: 500;
+        }
+        
+        .safety-flag-red {
+            background-color: #ffebee;
+            border: 3px solid var(--esi-1-red);
+            color: var(--esi-1-red);
+            animation: pulseAlert 2s ease-in-out infinite;
+            box-shadow: 0 4px 12px rgba(211, 47, 47, 0.3);
+        }
+        
+        .safety-flag-yellow {
+            background-color: #fff9c4;
+            border: 2px solid var(--esi-3-yellow);
+            color: #f57f17;
+        }
+        
+        .safety-flag-green {
+            background-color: #e8f5e9;
+            border: 2px solid var(--esi-4-green);
+            color: var(--esi-4-green);
+        }
+        
+        .action-buttons {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+        
+        .btn {
+            flex: 1;
+            padding: 0.75rem;
+            border: none;
+            border-radius: 4px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .btn-accept {
+            background-color: var(--esi-4-green);
+            color: white;
+        }
+        
+        .btn-accept:hover {
+            background-color: #2e7d32;
+        }
+        
+        .btn-override {
+            background-color: var(--esi-2-orange);
+            color: white;
+        }
+        
+        .btn-override:hover {
+            background-color: #e64a19;
+        }
+        
+        /* Responsive Design */
+        @media (max-width: 1200px) {
+            .main-content {
+                flex-direction: column;
+            }
+            
+            .left-sidebar,
+            .right-panel {
+                max-width: 100%;
+                min-width: 100%;
+            }
+        }
+        
+        /* Loading Spinner */
+        .spinner {
+            display: none;
+            border: 3px solid var(--border-color);
+            border-top: 3px solid var(--esi-5-blue);
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 2rem auto;
+        }
+        
+        .spinner.active {
+            display: block;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation Header -->
+    <nav class="nav-header">
+        <div class="nav-container">
+            <div>
+                <div class="nav-brand">
+                    🏥 PatientTriage.ai
+                </div>
+                <div class="nav-subtitle">
+                    AI-Assisted Emergency Department Triage · ESI Classification
+                </div>
+            </div>
+            <div class="nav-tabs">
+                <a href="index.html" class="nav-tab active">📝 Patient Intake</a>
+                <a href="queue.html" class="nav-tab">📋 ED Queue</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <!-- Top Bar - Demo Patient Selector -->
+        <div class="top-bar">
+            <div class="top-bar-header">
+                <h1>🏥 PatientTriage.ai - Clinical Interface</h1>
+                <div class="demo-selector-section">
+                    <label for="demo-patient-selector">Demo Patient:</label>
+                    <select id="demo-patient-selector">
+                        <option value="">-- Load Test Patient --</option>
+                        <!-- Options will be populated dynamically -->
+                    </select>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Main Content Area -->
+        <div class="main-content">
+            <!-- Left Sidebar - Patient Intake Form -->
+            <div class="left-sidebar">
+                <form id="patient-intake-form">
+                    <!-- Age Group Badge -->
+                    <div id="age-group-badge" style="display: none; padding: 0.75rem; margin-bottom: 1rem; border-radius: 4px; font-weight: 500; text-align: center;"></div>
+                    
+                    <div class="form-section">
+                        <h2>Patient Demographics</h2>
+                        <div class="form-group">
+                            <label>Patient Name <span class="required-indicator">*</span></label>
+                            <input type="text" id="patient-name" name="patient_name" required placeholder="Enter patient full name">
+                            <small class="helper-text" style="color: var(--text-secondary); font-size: 0.85rem; margin-top: 0.25rem; display: block;">Full legal name</small>
+                        </div>
+                        <div class="form-group">
+                            <label>Age (years) <span class="required-indicator">*</span></label>
+                            <input type="number" id="age" name="age" min="0" max="120" required>
+                            <small class="helper-text" style="color: var(--text-secondary); font-size: 0.85rem; margin-top: 0.25rem; display: block;">Age: 0-120 years</small>
+                        </div>
+                        <div class="form-group">
+                            <label>Sex <span class="required-indicator">*</span></label>
+                            <select id="sex" name="sex" required>
+                                <option value="">Select...</option>
+                                <option value="male">Male</option>
+                                <option value="female">Female</option>
+                                <option value="other">Other</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="form-section">
+                        <h2>Vital Signs</h2>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Heart Rate (bpm) <span class="required-indicator">*</span></label>
+                                <input type="number" id="heart-rate" name="heart_rate" min="20" max="250" required>
+                                <small class="helper-text vital-range-hr" style="color: var(--text-secondary); font-size: 0.85rem; margin-top: 0.25rem; display: block;">Normal: 60-100 bpm</small>
+                            </div>
+                            <div class="form-group">
+                                <label>Resp Rate (breaths/min) <span class="required-indicator">*</span></label>
+                                <input type="number" id="resp-rate" name="resp_rate" min="5" max="60" required>
+                                <small class="helper-text vital-range-rr" style="color: var(--text-secondary); font-size: 0.85rem; margin-top: 0.25rem; display: block;">Normal: 12-20 breaths/min</small>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>BP Systolic (mmHg) <span class="required-indicator">*</span></label>
+                                <input type="number" id="bp-systolic" name="bp_systolic" min="50" max="250" required>
+                                <small class="helper-text vital-range-bp-sys" style="color: var(--text-secondary); font-size: 0.85rem; margin-top: 0.25rem; display: block;">Normal: 90-120 mmHg</small>
+                            </div>
+                            <div class="form-group">
+                                <label>BP Diastolic (mmHg) <span class="required-indicator">*</span></label>
+                                <input type="number" id="bp-diastolic" name="bp_diastolic" min="30" max="150" required>
+                                <small class="helper-text vital-range-bp-dia" style="color: var(--text-secondary); font-size: 0.85rem; margin-top: 0.25rem; display: block;">Normal: 60-80 mmHg</small>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>SpO2 (%) <span class="required-indicator">*</span></label>
+                                <input type="number" id="spo2" name="spo2" min="50" max="100" required>
+                                <small class="helper-text" style="color: var(--text-secondary); font-size: 0.85rem; margin-top: 0.25rem; display: block;">Normal: ≥95%</small>
+                            </div>
+                            <div class="form-group">
+                                <label>Temperature (°C)</label>
+                                <input type="number" id="temperature" name="temperature" min="32" max="42" step="0.1">
+                                <small class="helper-text vital-range-temp" style="color: var(--text-secondary); font-size: 0.85rem; margin-top: 0.25rem; display: block;">Normal: 36.5-37.5°C (Optional)</small>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="form-section">
+                        <h2>Clinical Information</h2>
+                        <div class="form-group">
+                            <label>Chief Complaint <span class="required-indicator">*</span></label>
+                            <select id="chief-complaint" name="chief_complaint" required>
+                                <option value="">Select complaint category...</option>
+                                <!-- Cardiovascular -->
+                                <option value="chest_pain_cardiac">Chest Pain (Cardiac)</option>
+                                <option value="chest_pain_noncardiac">Chest Pain (Non-Cardiac)</option>
+                                <option value="palpitations">Palpitations</option>
+                                <option value="hypertensive_emergency">Hypertensive Emergency</option>
+                                <!-- Respiratory -->
+                                <option value="shortness_of_breath">Shortness of Breath</option>
+                                <option value="respiratory_distress">Respiratory Distress</option>
+                                <option value="asthma_exacerbation">Asthma Exacerbation</option>
+                                <option value="copd_exacerbation">COPD Exacerbation</option>
+                                <option value="cough">Cough</option>
+                                <option value="hemoptysis">Hemoptysis (Coughing Blood)</option>
+                                <!-- Gastrointestinal -->
+                                <option value="abdominal_pain_severe">Abdominal Pain (Severe)</option>
+                                <option value="abdominal_pain_mild">Abdominal Pain (Mild)</option>
+                                <option value="gi_bleed">GI Bleed</option>
+                                <option value="nausea_vomiting">Nausea/Vomiting</option>
+                                <option value="diarrhea">Diarrhea</option>
+                                <option value="constipation">Constipation</option>
+                                <!-- Neurological -->
+                                <option value="altered_mental_status">Altered Mental Status</option>
+                                <option value="stroke_suspected">Stroke Suspected</option>
+                                <option value="seizure">Seizure</option>
+                                <option value="headache_severe">Headache (Severe)</option>
+                                <option value="headache_mild">Headache (Mild)</option>
+                                <option value="syncope">Syncope (Fainting)</option>
+                                <option value="dizziness">Dizziness/Vertigo</option>
+                                <option value="weakness">Weakness/Numbness</option>
+                                <!-- Trauma -->
+                                <option value="trauma_severe">Trauma (Severe/Multi-system)</option>
+                                <option value="trauma_moderate">Trauma (Moderate)</option>
+                                <option value="trauma_minor">Trauma (Minor)</option>
+                                <option value="fall">Fall</option>
+                                <option value="motor_vehicle_collision">Motor Vehicle Collision</option>
+                                <option value="assault">Assault/Violence</option>
+                                <option value="burn">Burn</option>
+                                <option value="laceration">Laceration/Cut</option>
+                                <option value="fracture_suspected">Fracture Suspected</option>
+                                <!-- Infectious Disease -->
+                                <option value="fever_adult">Fever (Adult)</option>
+                                <option value="fever_pediatric">Fever (Pediatric)</option>
+                                <option value="sepsis_suspected">Sepsis Suspected</option>
+                                <option value="infection_wound">Wound Infection</option>
+                                <option value="infection_uti">Urinary Tract Infection</option>
+                                <option value="infection_respiratory">Respiratory Infection</option>
+                                <!-- Allergic/Immunologic -->
+                                <option value="anaphylaxis">Anaphylaxis</option>
+                                <option value="allergic_reaction">Allergic Reaction (Non-Severe)</option>
+                                <option value="rash">Rash</option>
+                                <!-- Musculoskeletal -->
+                                <option value="back_pain_severe">Back Pain (Severe)</option>
+                                <option value="back_pain_mild">Back Pain (Mild)</option>
+                                <option value="joint_pain">Joint Pain</option>
+                                <option value="extremity_pain">Extremity Pain</option>
+                                <!-- Genitourinary -->
+                                <option value="urinary_symptoms">Urinary Symptoms</option>
+                                <option value="kidney_stone_suspected">Kidney Stone Suspected</option>
+                                <option value="urinary_retention">Urinary Retention</option>
+                                <!-- Psychiatric -->
+                                <option value="psychiatric_emergency">Psychiatric Emergency</option>
+                                <option value="suicidal_ideation">Suicidal Ideation</option>
+                                <option value="anxiety_panic">Anxiety/Panic Attack</option>
+                                <option value="agitation">Agitation</option>
+                                <!-- Toxicological -->
+                                <option value="overdose">Overdose/Poisoning</option>
+                                <option value="alcohol_intoxication">Alcohol Intoxication</option>
+                                <option value="drug_withdrawal">Drug Withdrawal</option>
+                                <!-- Other -->
+                                <option value="cold_flu_symptoms">Cold/Flu Symptoms</option>
+                                <option value="eye_complaint">Eye Complaint</option>
+                                <option value="ear_complaint">Ear Complaint</option>
+                                <option value="dental_complaint">Dental Complaint</option>
+                                <option value="pregnancy_related">Pregnancy Related</option>
+                                <option value="vaginal_bleeding">Vaginal Bleeding</option>
+                                <option value="other">Other</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Arrival Mode <span class="required-indicator">*</span></label>
+                            <select id="arrival-mode" name="arrival_mode" required>
+                                <option value="">Select arrival mode...</option>
+                                <option value="walk_in">Walk-in</option>
+                                <option value="wheelchair">Wheelchair</option>
+                                <option value="ambulance">Ambulance</option>
+                                <option value="police">Police</option>
+                                <option value="other">Other</option>
+                            </select>
+                            <small class="helper-text" style="color: var(--text-secondary); font-size: 0.85rem; margin-top: 0.25rem; display: block;">How did the patient arrive?</small>
+                        </div>
+                        <div class="form-group">
+                            <label>Mental Status <span class="required-indicator">*</span></label>
+                            <select id="mental-status" name="mental_status" required>
+                                <option value="">Select mental status...</option>
+                                <option value="alert">Alert</option>
+                                <option value="confused">Confused</option>
+                                <option value="drowsy">Drowsy</option>
+                                <option value="unresponsive">Unresponsive</option>
+                            </select>
+                            <small class="helper-text" style="color: var(--text-secondary); font-size: 0.85rem; margin-top: 0.25rem; display: block;">Patient's level of consciousness</small>
+                        </div>
+                        <div class="form-group">
+                            <label>Pain Score (0-10)</label>
+                            <input type="number" id="pain-score" name="pain_score" min="0" max="10">
+                            <small class="helper-text" style="color: var(--text-secondary); font-size: 0.85rem; margin-top: 0.25rem; display: block;">0 = No pain, 10 = Worst pain (Optional)</small>
+                        </div>
+                        <div class="form-group">
+                            <label>Medical History</label>
+                            <textarea id="medical-history" name="medical_history" placeholder="Optional: Previous conditions, medications, allergies..."></textarea>
+                        </div>
+                    </div>
+                    
+                    <!-- Data Completeness Indicator -->
+                    <div class="form-section">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+                            <span style="font-weight: 500; color: var(--text-secondary);">Data Completeness</span>
+                            <span id="completeness-percentage" style="font-weight: 600; color: var(--esi-5-blue);">0%</span>
+                        </div>
+                        <div style="height: 8px; background-color: var(--border-color); border-radius: 4px; overflow: hidden;">
+                            <div id="completeness-bar" style="height: 100%; background-color: var(--esi-5-blue); width: 0%; transition: width 0.3s ease;"></div>
+                        </div>
+                    </div>
+                    
+                    <button type="submit" class="submit-btn">Get AI Triage Recommendation</button>
+                </form>
+            </div>
+            
+            <!-- Right Panel - ML Recommendation Display -->
+            <div class="right-panel">
+                <!-- Placeholder shown when no prediction -->
+                <div class="recommendation-placeholder" id="recommendation-placeholder">
+                    <svg viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/>
+                    </svg>
+                    <h3>No Prediction Yet</h3>
+                    <p>Complete the patient intake form and submit to see AI triage recommendation</p>
+                </div>
+                
+                <!-- Loading spinner -->
+                <div class="spinner" id="loading-spinner"></div>
+                
+                <!-- Recommendation content (hidden by default) -->
+                <div class="recommendation-content" id="recommendation-content">
+                    <!-- ESI Level Display -->
+                    <div class="esi-display" id="esi-display">
+                        <h2>ESI Level <span id="esi-level">-</span></h2>
+                        <p id="esi-description">-</p>
+                    </div>
+                    
+                    <!-- Safety Flag Banner -->
+                    <div class="safety-flag-banner" id="safety-flag-banner" style="display: none;">
+                        <strong>Safety Alert:</strong> <span id="safety-flag-text"></span>
+                    </div>
+                    
+                    <!-- Probability Distribution Chart -->
+                    <div class="result-section">
+                        <h3>ESI Probability Distribution</h3>
+                        <div class="chart-container">
+                            <canvas id="probability-chart"></canvas>
+                        </div>
+                    </div>
+                    
+                    <!-- Confidence Breakdown -->
+                    <div class="result-section">
+                        <h3>Confidence Assessment</h3>
+                        <div class="confidence-breakdown" id="confidence-breakdown">
+                            <!-- Will be populated dynamically -->
+                        </div>
+                    </div>
+                    
+                    <!-- SHAP Explanation -->
+                    <div class="result-section">
+                        <h3>Explanation (SHAP Analysis)</h3>
+                        <p id="shap-explanation">-</p>
+                        <div class="chart-container">
+                            <canvas id="shap-chart"></canvas>
+                        </div>
+                    </div>
+                    
+                    <!-- Action Buttons -->
+                    <div class="action-buttons">
+                        <button class="btn btn-accept" id="accept-btn">Accept Recommendation</button>
+                        <button class="btn btn-override" id="override-btn">Override ESI Level</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // JavaScript functionality will be implemented in Tasks 5.2-6.2
+        console.log('PatientTriage.ai Clinical Interface loaded');
+        console.log('Chart.js version:', Chart.version);
+        
+        // Age-specific vital sign ranges
+        const VITAL_RANGES = {
+            'infant_0_2': {
+                hr_min: 100, hr_max: 160,
+                bp_sys_min: 70, bp_sys_max: 100,
+                bp_dia_min: 40, bp_dia_max: 60,
+                rr_min: 30, rr_max: 60,
+                temp_min: 36.5, temp_max: 37.5,
+                spo2_min: 95
+            },
+            'child_3_12': {
+                hr_min: 70, hr_max: 120,
+                bp_sys_min: 90, bp_sys_max: 110,
+                bp_dia_min: 50, bp_dia_max: 70,
+                rr_min: 20, rr_max: 30,
+                temp_min: 36.5, temp_max: 37.5,
+                spo2_min: 95
+            },
+            'adolescent_13_17': {
+                hr_min: 60, hr_max: 100,
+                bp_sys_min: 100, bp_sys_max: 120,
+                bp_dia_min: 60, bp_dia_max: 80,
+                rr_min: 12, rr_max: 20,
+                temp_min: 36.5, temp_max: 37.5,
+                spo2_min: 95
+            },
+            'adult_18_64': {
+                hr_min: 60, hr_max: 100,
+                bp_sys_min: 90, bp_sys_max: 120,
+                bp_dia_min: 60, bp_dia_max: 80,
+                rr_min: 12, rr_max: 20,
+                temp_min: 36.5, temp_max: 37.5,
+                spo2_min: 95
+            },
+            'geriatric_65_plus': {
+                hr_min: 60, hr_max: 100,
+                bp_sys_min: 90, bp_sys_max: 140,
+                bp_dia_min: 60, bp_dia_max: 90,
+                rr_min: 12, rr_max: 20,
+                temp_min: 36.0, temp_max: 37.5,
+                spo2_min: 92
+            }
+        };
+        
+        // Classify age group
+        function getAgeGroup(age) {
+            if (age <= 2) return 'infant_0_2';
+            if (age <= 12) return 'child_3_12';
+            if (age <= 17) return 'adolescent_13_17';
+            if (age <= 64) return 'adult_18_64';
+            return 'geriatric_65_plus';
+        }
+        
+        // Update age group badge and vital ranges
+        function updateAgeGroupDisplay(age) {
+            const ageGroup = getAgeGroup(age);
+            const ranges = VITAL_RANGES[ageGroup];
+            const badge = document.getElementById('age-group-badge');
+            
+            // Update badge
+            if (age < 18) {
+                badge.style.display = 'block';
+                badge.style.backgroundColor = '#e3f2fd';
+                badge.style.color = '#1976d2';
+                badge.innerHTML = '👶 PEDIATRIC PATIENT';
+                if (ageGroup === 'infant_0_2') badge.innerHTML += ' (Infant 0-2)';
+                else if (ageGroup === 'child_3_12') badge.innerHTML += ' (Child 3-12)';
+                else badge.innerHTML += ' (Adolescent 13-17)';
+            } else if (age >= 65) {
+                badge.style.display = 'block';
+                badge.style.backgroundColor = '#f3e5f5';
+                badge.style.color = '#7b1fa2';
+                badge.innerHTML = '👴 GERIATRIC PATIENT (65+)';
+            } else {
+                badge.style.display = 'none';
+            }
+            
+            // Update vital ranges helper text
+            document.querySelector('.vital-range-hr').textContent = 
+                `Normal ${ageGroup.replace(/_/g, ' ')}: ${ranges.hr_min}-${ranges.hr_max} bpm`;
+            document.querySelector('.vital-range-rr').textContent = 
+                `Normal: ${ranges.rr_min}-${ranges.rr_max} breaths/min`;
+            document.querySelector('.vital-range-bp-sys').textContent = 
+                `Normal: ${ranges.bp_sys_min}-${ranges.bp_sys_max} mmHg`;
+            document.querySelector('.vital-range-bp-dia').textContent = 
+                `Normal: ${ranges.bp_dia_min}-${ranges.bp_dia_max} mmHg`;
+            document.querySelector('.vital-range-temp').textContent = 
+                `Normal: ${ranges.temp_min}-${ranges.temp_max}°C (Optional)`;
+        }
+        
+        // Calculate data completeness
+        function calculateDataCompleteness() {
+            const form = document.getElementById('patient-intake-form');
+            const formData = new FormData(form);
+            
+            // Required fields (9 total - added patient_name)
+            const requiredFields = ['patient_name', 'age', 'sex', 'heart_rate', 'resp_rate', 'bp_systolic', 'bp_diastolic', 'spo2', 'chief_complaint', 'arrival_mode', 'mental_status'];
+            // Optional fields (3 total)
+            const optionalFields = ['temperature', 'pain_score', 'medical_history'];
+            
+            let filledRequired = 0;
+            let filledOptional = 0;
+            
+            requiredFields.forEach(field => {
+                const value = formData.get(field);
+                if (value && value.trim() !== '') {
+                    filledRequired++;
+                }
+            });
+            
+            optionalFields.forEach(field => {
+                const value = formData.get(field);
+                if (value && value.trim() !== '') {
+                    filledOptional++;
+                }
+            });
+            
+            // Calculate percentage: required fields are 70%, optional are 30%
+            const requiredPercentage = (filledRequired / requiredFields.length) * 70;
+            const optionalPercentage = (filledOptional / optionalFields.length) * 30;
+            const totalPercentage = Math.round(requiredPercentage + optionalPercentage);
+            
+            // Update display
+            document.getElementById('completeness-percentage').textContent = totalPercentage + '%';
+            document.getElementById('completeness-bar').style.width = totalPercentage + '%';
+            
+            // Change color based on completeness
+            const bar = document.getElementById('completeness-bar');
+            if (totalPercentage >= 80) {
+                bar.style.backgroundColor = '#388e3c'; // Green
+            } else if (totalPercentage >= 60) {
+                bar.style.backgroundColor = '#fbc02d'; // Yellow
+            } else {
+                bar.style.backgroundColor = '#f57c00'; // Orange
+            }
+            
+            return totalPercentage;
+        }
+        
+        // Age input listener
+        document.getElementById('age').addEventListener('input', function(e) {
+            const age = parseInt(e.target.value);
+            if (age >= 0 && age <= 120) {
+                updateAgeGroupDisplay(age);
+            }
+            calculateDataCompleteness();
+        });
+        
+        // Add listeners to all form inputs for data completeness and real-time validation
+        const allInputs = document.querySelectorAll('#patient-intake-form input, #patient-intake-form select, #patient-intake-form textarea');
+        allInputs.forEach(input => {
+            input.addEventListener('input', function() {
+                calculateDataCompleteness();
+                // Perform real-time validation
+                if (input.type === 'number' && input.id !== 'age') {
+                    const validation = validateVitalSigns();
+                    // Clear previous validation states
+                    input.classList.remove('error', 'warning');
+                    // Apply new states if needed (simplified - full implementation in production)
+                }
+            });
+            input.addEventListener('change', calculateDataCompleteness);
+        });
+        
+        // Client-side validation for vital signs
+        function validateVitalSigns() {
+            const age = parseInt(document.getElementById('age').value);
+            if (!age && age !== 0) return []; // Skip if age not entered yet
+            
+            const ageGroup = getAgeGroup(age);
+            const ranges = VITAL_RANGES[ageGroup];
+            
+            const hr = parseInt(document.getElementById('heart-rate').value);
+            const rr = parseInt(document.getElementById('resp-rate').value);
+            const bpSys = parseInt(document.getElementById('bp-systolic').value);
+            const bpDia = parseInt(document.getElementById('bp-diastolic').value);
+            const spo2 = parseInt(document.getElementById('spo2').value);
+            const temp = parseFloat(document.getElementById('temperature').value);
+            
+            let warnings = [];
+            let errors = [];
+            
+            // Age validation
+            if (age < 0 || age > 120) {
+                errors.push('Age must be between 0 and 120 years');
+            }
+            
+            // Heart Rate validation
+            if (hr) {
+                if (hr < 20 || hr > 250) {
+                    errors.push('Heart rate must be between 20 and 250 bpm');
+                } else if (hr < ranges.hr_min || hr > ranges.hr_max) {
+                    warnings.push(`Heart rate ${hr} bpm is outside normal range for age group (${ranges.hr_min}-${ranges.hr_max})`);
+                }
+            }
+            
+            // Respiratory Rate validation
+            if (rr) {
+                if (rr < 5 || rr > 60) {
+                    errors.push('Respiratory rate must be between 5 and 60 breaths/min');
+                } else if (rr < ranges.rr_min || rr > ranges.rr_max) {
+                    warnings.push(`Respiratory rate ${rr} breaths/min is outside normal range (${ranges.rr_min}-${ranges.rr_max})`);
+                }
+            }
+            
+            // Blood Pressure validation
+            if (bpSys) {
+                if (bpSys < 50 || bpSys > 250) {
+                    errors.push('BP Systolic must be between 50 and 250 mmHg');
+                } else if (bpSys < ranges.bp_sys_min || bpSys > ranges.bp_sys_max) {
+                    warnings.push(`BP Systolic ${bpSys} mmHg is outside normal range (${ranges.bp_sys_min}-${ranges.bp_sys_max})`);
+                }
+            }
+            
+            if (bpDia) {
+                if (bpDia < 30 || bpDia > 150) {
+                    errors.push('BP Diastolic must be between 30 and 150 mmHg');
+                } else if (bpDia < ranges.bp_dia_min || bpDia > ranges.bp_dia_max) {
+                    warnings.push(`BP Diastolic ${bpDia} mmHg is outside normal range (${ranges.bp_dia_min}-${ranges.bp_dia_max})`);
+                }
+            }
+            
+            // BP systolic must be higher than diastolic
+            if (bpSys && bpDia && bpSys <= bpDia) {
+                errors.push('BP Systolic must be higher than BP Diastolic');
+            }
+            
+            // SpO2 validation
+            if (spo2) {
+                if (spo2 < 50 || spo2 > 100) {
+                    errors.push('SpO2 must be between 50 and 100%');
+                } else if (spo2 < ranges.spo2_min) {
+                    warnings.push(`SpO2 ${spo2}% is below normal (≥${ranges.spo2_min}%)`);
+                }
+            }
+            
+            // Temperature validation (optional field)
+            if (temp) {
+                if (temp < 32 || temp > 42) {
+                    errors.push('Temperature must be between 32 and 42°C');
+                } else if (temp < ranges.temp_min || temp > ranges.temp_max) {
+                    warnings.push(`Temperature ${temp.toFixed(1)}°C is outside normal range (${ranges.temp_min}-${ranges.temp_max}°C)`);
+                }
+            }
+            
+            // Pain score validation (optional field)
+            const painScore = parseInt(document.getElementById('pain-score').value);
+            if (painScore && (painScore < 0 || painScore > 10)) {
+                errors.push('Pain score must be between 0 and 10');
+            }
+            
+            return { errors, warnings };
+        }
+        
+        // Validate required fields
+        function validateRequiredFields() {
+            const errors = [];
+            
+            // Check required fields
+            const patientName = document.getElementById('patient-name').value;
+            const age = document.getElementById('age').value;
+            const sex = document.getElementById('sex').value;
+            const hr = document.getElementById('heart-rate').value;
+            const rr = document.getElementById('resp-rate').value;
+            const bpSys = document.getElementById('bp-systolic').value;
+            const bpDia = document.getElementById('bp-diastolic').value;
+            const spo2 = document.getElementById('spo2').value;
+            const chiefComplaint = document.getElementById('chief-complaint').value;
+            const arrivalMode = document.getElementById('arrival-mode').value;
+            const mentalStatus = document.getElementById('mental-status').value;
+            
+            if (!patientName || !patientName.trim()) errors.push('Patient Name is required');
+            if (!age && age !== '0') errors.push('Age is required');
+            if (!sex) errors.push('Sex is required');
+            if (!hr) errors.push('Heart Rate is required');
+            if (!rr) errors.push('Respiratory Rate is required');
+            if (!bpSys) errors.push('BP Systolic is required');
+            if (!bpDia) errors.push('BP Diastolic is required');
+            if (!spo2) errors.push('SpO2 is required');
+            if (!chiefComplaint) errors.push('Chief Complaint is required');
+            if (!arrivalMode) errors.push('Arrival Mode is required');
+            if (!mentalStatus) errors.push('Mental Status is required');
+            
+            return errors;
+        }
+        
+        // Global variables for Chart.js instances
+        let probabilityChart = null;
+        let shapChart = null;
+        
+        // Display ML Recommendation Panel
+        function displayRecommendation(predictionResponse) {
+            // Store current prediction for override functionality
+            currentPredictionResponse = predictionResponse;
+            
+            // Hide placeholder and loading spinner
+            document.getElementById('recommendation-placeholder').style.display = 'none';
+            document.getElementById('loading-spinner').classList.remove('active');
+            
+            // Show recommendation content
+            const recommendationContent = document.getElementById('recommendation-content');
+            recommendationContent.classList.add('active');
+            
+            // Get right panel for high-risk styling
+            const rightPanel = document.querySelector('.right-panel');
+            
+            // TASK 7.1: Add high-risk visual alerts
+            // Reset high-risk styling
+            rightPanel.classList.remove('high-risk-panel');
+            
+            // If predicted ESI is 1, add pulsing red border animation
+            if (predictionResponse.esi_prediction === 1) {
+                rightPanel.classList.add('high-risk-panel');
+                console.log('🚨 HIGH RISK: ESI 1 detected - applying pulsing red border');
+            }
+            
+            // If safety flag is RED, also add high-risk styling
+            if (predictionResponse.safety_flag.outcome === 'RED') {
+                rightPanel.classList.add('high-risk-panel');
+                console.log('🚨 HIGH RISK: RED safety flag detected - applying pulsing red border');
+            }
+            
+            // 1. Display predicted ESI level prominently with color-coded badge
+            displayESILevel(predictionResponse.esi_prediction);
+            
+            // 2. Show probability distribution as horizontal bar chart (Chart.js)
+            displayProbabilityChart(predictionResponse.probability_distribution);
+            
+            // 3. Display overall confidence level with icon and color
+            // 4. Show confidence breakdown as 4 progress bars
+            displayConfidenceBreakdown(predictionResponse.confidence_breakdown, predictionResponse.esi_prediction);
+            
+            // 5. Display safety flag with prominent banner
+            displaySafetyFlag(predictionResponse.safety_flag);
+            
+            // 6. Show SHAP explanation in natural language with feature contribution chart
+            displaySHAPExplanation(predictionResponse.explanation);
+            
+            // Scroll to results
+            recommendationContent.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+        
+        // 1. Display ESI Level with color coding
+        function displayESILevel(esiLevel) {
+            const esiDisplay = document.getElementById('esi-display');
+            const esiLevelSpan = document.getElementById('esi-level');
+            const esiDescription = document.getElementById('esi-description');
+            
+            // Set ESI level
+            esiLevelSpan.textContent = esiLevel;
+            
+            // Set description
+            const descriptions = {
+                1: 'Resuscitation - Life-threatening',
+                2: 'Emergent - High risk',
+                3: 'Urgent - Moderate risk',
+                4: 'Less Urgent - Low risk',
+                5: 'Non-Urgent - Minimal risk'
+            };
+            esiDescription.textContent = descriptions[esiLevel] || '';
+            
+            // Set color coding
+            esiDisplay.className = 'esi-display esi-' + esiLevel;
+            
+            // Add pulsing animation for ESI 1
+            if (esiLevel === 1) {
+                esiDisplay.style.animation = 'pulse 2s infinite';
+            } else {
+                esiDisplay.style.animation = 'none';
+            }
+        }
+        
+        // Add CSS animation for pulsing (ESI 1) and red border pulsing
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes pulse {
+                0%, 100% { opacity: 1; transform: scale(1); }
+                50% { opacity: 0.9; transform: scale(1.02); }
+            }
+            
+            @keyframes pulseBorder {
+                0%, 100% { 
+                    border-color: var(--esi-1-red); 
+                    box-shadow: 0 0 0 0 rgba(211, 47, 47, 0.7);
+                }
+                50% { 
+                    border-color: #ff5252; 
+                    box-shadow: 0 0 0 8px rgba(211, 47, 47, 0);
+                }
+            }
+            
+            @keyframes pulseAlert {
+                0%, 100% {
+                    transform: scale(1);
+                    box-shadow: 0 4px 12px rgba(211, 47, 47, 0.3);
+                }
+                50% {
+                    transform: scale(1.01);
+                    box-shadow: 0 6px 20px rgba(211, 47, 47, 0.5);
+                }
+            }
+            
+            .high-risk-panel {
+                border: 4px solid var(--esi-1-red);
+                animation: pulseBorder 2s infinite;
+            }
+            
+            .low-confidence-warning {
+                background-color: #ffebee;
+                border-left: 4px solid var(--esi-1-red);
+                padding: 1rem;
+                margin: 1rem 0;
+                border-radius: 4px;
+            }
+        `;
+        document.head.appendChild(style);
+        
+        // 2. Display probability distribution chart
+        function displayProbabilityChart(probabilityDistribution) {
+            const ctx = document.getElementById('probability-chart');
+            
+            // Destroy previous chart if exists
+            if (probabilityChart) {
+                probabilityChart.destroy();
+            }
+            
+            // Convert to percentages
+            const percentages = probabilityDistribution.map(p => (p * 100).toFixed(1));
+            
+            // ESI colors
+            const esiColors = [
+                'rgba(211, 47, 47, 0.8)',   // ESI 1 - Red
+                'rgba(245, 124, 0, 0.8)',   // ESI 2 - Orange
+                'rgba(251, 192, 45, 0.8)',  // ESI 3 - Yellow
+                'rgba(56, 142, 60, 0.8)',   // ESI 4 - Green
+                'rgba(25, 118, 210, 0.8)'   // ESI 5 - Blue
+            ];
+            
+            probabilityChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: ['ESI 1', 'ESI 2', 'ESI 3', 'ESI 4', 'ESI 5'],
+                    datasets: [{
+                        label: 'Probability (%)',
+                        data: percentages,
+                        backgroundColor: esiColors,
+                        borderColor: esiColors.map(c => c.replace('0.8', '1')),
+                        borderWidth: 2
+                    }]
+                },
+                options: {
+                    indexAxis: 'y', // Horizontal bars
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return context.parsed.x.toFixed(1) + '%';
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            beginAtZero: true,
+                            max: 100,
+                            title: {
+                                display: true,
+                                text: 'Probability (%)'
+                            },
+                            ticks: {
+                                callback: function(value) {
+                                    return value + '%';
+                                }
+                            }
+                        },
+                        y: {
+                            title: {
+                                display: true,
+                                text: 'ESI Level'
+                            }
+                        }
+                    }
+                }
+            });
+        }
+        
+        // 3 & 4. Display confidence breakdown
+        function displayConfidenceBreakdown(confidenceBreakdown, esiPrediction) {
+            const container = document.getElementById('confidence-breakdown');
+            
+            // Overall confidence header
+            const overallConfidence = confidenceBreakdown.overall;
+            const confidenceLevel = confidenceBreakdown.level;
+            
+            // Confidence icon and color
+            let confidenceIcon = '';
+            let confidenceColor = '';
+            if (confidenceLevel === 'HIGH') {
+                confidenceIcon = '✅';
+                confidenceColor = '#388e3c'; // Green
+            } else if (confidenceLevel === 'MEDIUM') {
+                confidenceIcon = '⚠️';
+                confidenceColor = '#fbc02d'; // Yellow
+            } else {
+                confidenceIcon = '🔴';
+                confidenceColor = '#d32f2f'; // Red
+            }
+            
+            // Build HTML
+            let html = `
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; padding: 0.75rem; background-color: white; border-radius: 4px; border-left: 4px solid ${confidenceColor};">
+                    <div>
+                        <strong style="font-size: 1.1rem;">Overall Confidence: ${confidenceLevel}</strong>
+                        <span style="margin-left: 0.5rem; font-size: 1.3rem;">${confidenceIcon}</span>
+                    </div>
+                    <div style="font-size: 1.3rem; font-weight: bold; color: ${confidenceColor};">
+                        ${overallConfidence.toFixed(1)}%
+                    </div>
+                </div>
+            `;
+            
+            // Four confidence dimensions
+            const dimensions = [
+                { label: 'Model Certainty', value: confidenceBreakdown.model_certainty, 
+                  tooltip: 'Confidence in the model\'s prediction based on probability distribution' },
+                { label: 'Data Completeness', value: confidenceBreakdown.data_completeness,
+                  tooltip: 'Percentage of expected data fields present in patient record' },
+                { label: 'Clinical Consistency', value: confidenceBreakdown.clinical_consistency,
+                  tooltip: 'Alignment between symptoms and vital signs' },
+                { label: 'Pattern Recognition', value: confidenceBreakdown.pattern_recognition,
+                  tooltip: 'Similarity to training data patterns' }
+            ];
+            
+            dimensions.forEach(dim => {
+                // Determine color based on value
+                let barColor = '';
+                if (dim.value >= 80) {
+                    barColor = '#388e3c'; // Green
+                } else if (dim.value >= 60) {
+                    barColor = '#fbc02d'; // Yellow
+                } else {
+                    barColor = '#f57c00'; // Orange
+                }
+                
+                html += `
+                    <div class="confidence-item">
+                        <div class="confidence-item-header">
+                            <span style="font-weight: 500;" title="${dim.tooltip}">${dim.label}</span>
+                            <span style="font-weight: 600; color: ${barColor};">${dim.value.toFixed(1)}%</span>
+                        </div>
+                        <div class="confidence-bar">
+                            <div class="confidence-bar-fill" style="width: ${dim.value}%; background-color: ${barColor};"></div>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            container.innerHTML = html;
+            
+            // Show LOW confidence warning if applicable
+            if (confidenceLevel === 'LOW') {
+                container.innerHTML += `
+                    <div style="margin-top: 1rem; padding: 0.75rem; background-color: #ffebee; border-left: 4px solid #d32f2f; border-radius: 4px;">
+                        <strong style="color: #d32f2f;">⚠️ LOW CONFIDENCE - Exercise Clinical Caution</strong>
+                        <p style="margin: 0.5rem 0 0 0; font-size: 0.9rem; color: #666;">
+                            This prediction has low confidence. Consider additional screening or apply extra clinical judgment.
+                        </p>
+                    </div>
+                `;
+            }
+            
+            // Show MEDIUM confidence warning for non-urgent cases (ESI 3-5)
+            if (confidenceLevel === 'MEDIUM' && esiPrediction >= 3) {
+                container.innerHTML += `
+                    <div style="margin-top: 1rem; padding: 0.75rem; background-color: #fff9c4; border-left: 4px solid #f57f17; border-radius: 4px;">
+                        <strong style="color: #f57f17;">⚠️ MEDIUM CONFIDENCE - Recommend Clinical Validation</strong>
+                        <p style="margin: 0.5rem 0 0 0; font-size: 0.9rem; color: #666;">
+                            This prediction has moderate confidence. Consider validating with additional clinical assessment.
+                        </p>
+                    </div>
+                `;
+            }
+        }
+        
+        // 5. Display safety flag banner
+        function displaySafetyFlag(safetyFlag) {
+            const banner = document.getElementById('safety-flag-banner');
+            const textSpan = document.getElementById('safety-flag-text');
+            
+            if (safetyFlag.outcome === 'GREEN') {
+                // No safety concerns - hide banner
+                banner.style.display = 'none';
+                return;
+            }
+            
+            // Show banner for RED or YELLOW
+            banner.style.display = 'block';
+            
+            // Set banner class
+            if (safetyFlag.outcome === 'RED') {
+                banner.className = 'safety-flag-banner safety-flag-red';
+                banner.innerHTML = `
+                    <div style="font-size: 1.2rem; font-weight: bold; margin-bottom: 0.5rem;">
+                        🚨 CRITICAL SAFETY ALERT
+                    </div>
+                `;
+            } else {
+                banner.className = 'safety-flag-banner safety-flag-yellow';
+                banner.innerHTML = `
+                    <div style="font-size: 1.1rem; font-weight: bold; margin-bottom: 0.5rem;">
+                        ⚠️ Caution Advised
+                    </div>
+                `;
+            }
+            
+            // Add recommended action
+            banner.innerHTML += `
+                <div style="margin-bottom: 0.5rem;">
+                    <strong>Recommendation:</strong> ${safetyFlag.recommended_action}
+                </div>
+            `;
+            
+            // Add triggered criteria
+            if (safetyFlag.triggered_criteria && safetyFlag.triggered_criteria.length > 0) {
+                banner.innerHTML += `
+                    <div>
+                        <strong>Triggered Criteria:</strong>
+                        <ul style="margin: 0.5rem 0 0 1.5rem; padding: 0;">
+                            ${safetyFlag.triggered_criteria.map(c => `<li>${c}</li>`).join('')}
+                        </ul>
+                    </div>
+                `;
+            }
+            
+            // Add override ESI if present (RED flag)
+            if (safetyFlag.override_esi) {
+                banner.innerHTML += `
+                    <div style="margin-top: 0.5rem; font-weight: bold; font-size: 1.1rem;">
+                        ⚠️ SAFETY OVERRIDE: Force ESI ${safetyFlag.override_esi}
+                    </div>
+                `;
+            }
+        }
+        
+        // 6. Display SHAP explanation with feature contribution chart
+        function displaySHAPExplanation(explanation) {
+            const explanationText = document.getElementById('shap-explanation');
+            const ctx = document.getElementById('shap-chart');
+            
+            // Display natural language explanation
+            explanationText.textContent = explanation.text;
+            
+            // Destroy previous chart if exists
+            if (shapChart) {
+                shapChart.destroy();
+            }
+            
+            // Extract top factors
+            const topFactors = explanation.top_factors || [];
+            
+            if (topFactors.length === 0) {
+                // No SHAP data available
+                ctx.parentElement.style.display = 'none';
+                return;
+            }
+            
+            ctx.parentElement.style.display = 'block';
+            
+            // Prepare data
+            const labels = topFactors.map(f => {
+                const featureName = f.feature.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+                return `${featureName}: ${f.value}`;
+            });
+            
+            const contributions = topFactors.map(f => f.contribution);
+            
+            // Color based on direction
+            const colors = topFactors.map(f => {
+                if (f.direction === 'increases urgency') {
+                    return 'rgba(211, 47, 47, 0.7)'; // Red (increases urgency)
+                } else if (f.direction === 'decreases urgency') {
+                    return 'rgba(56, 142, 60, 0.7)'; // Green (decreases urgency)
+                } else {
+                    return 'rgba(117, 117, 117, 0.7)'; // Gray (neutral)
+                }
+            });
+            
+            shapChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'SHAP Contribution',
+                        data: contributions,
+                        backgroundColor: colors,
+                        borderColor: colors.map(c => c.replace('0.7', '1')),
+                        borderWidth: 2
+                    }]
+                },
+                options: {
+                    indexAxis: 'y', // Horizontal bars
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    const factor = topFactors[context.dataIndex];
+                                    return [
+                                        `Contribution: ${context.parsed.x.toFixed(3)}`,
+                                        `Direction: ${factor.direction}`
+                                    ];
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            title: {
+                                display: true,
+                                text: 'Feature Contribution (SHAP Value)'
+                            }
+                        },
+                        y: {
+                            title: {
+                                display: true,
+                                text: 'Contributing Factors'
+                            }
+                        }
+                    }
+                }
+            });
+        }
+        
+        // ============================================================
+        // TASK 6.1: Submit Patient Data to /api/v1/predict
+        // ============================================================
+        
+        // Function to submit patient data and get AI recommendation
+        async function submitPatientData(patientData) {
+            try {
+                const response = await fetch('http://localhost:8000/api/v1/predict', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(patientData)
+                });
+                
+                if (!response.ok) {
+                    let errorMessage = `HTTP error! status: ${response.status}`;
+                    try {
+                        const errorData = await response.json();
+                        console.error('❌ API Error Response:', errorData);
+                        
+                        // Extract validation error details if present
+                        if (errorData.detail) {
+                            if (Array.isArray(errorData.detail)) {
+                                // Pydantic validation errors
+                                errorMessage = errorData.detail.map(err => 
+                                    `${err.loc.join('.')}: ${err.msg}`
+                                ).join('\n');
+                            } else if (typeof errorData.detail === 'string') {
+                                errorMessage = errorData.detail;
+                            } else {
+                                errorMessage = JSON.stringify(errorData.detail);
+                            }
+                        }
+                    } catch (parseError) {
+                        console.error('Could not parse error response:', parseError);
+                    }
+                    throw new Error(errorMessage);
+                }
+                
+                const predictionResponse = await response.json();
+                return predictionResponse;
+                
+            } catch (error) {
+                console.error('❌ API Error:', error);
+                throw error;
+            }
+        }
+        
+        // Form submission handler
+        document.getElementById('patient-intake-form').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            // Validate required fields
+            const requiredFieldErrors = validateRequiredFields();
+            if (requiredFieldErrors.length > 0) {
+                alert('Please fill in all required fields:\n\n' + requiredFieldErrors.join('\n'));
+                return;
+            }
+            
+            // Validate vital signs
+            const validation = validateVitalSigns();
+            
+            // Check for errors (blocking)
+            if (validation.errors && validation.errors.length > 0) {
+                alert('Validation Errors:\n\n' + validation.errors.join('\n') + '\n\nPlease correct these errors before submitting.');
+                return;
+            }
+            
+            // Check for warnings (allow proceed with confirmation)
+            if (validation.warnings && validation.warnings.length > 0) {
+                const proceed = confirm(
+                    '⚠️ Warning: Some vital signs are outside normal ranges:\n\n' + 
+                    validation.warnings.join('\n') + 
+                    '\n\nDo you want to proceed with the prediction?'
+                );
+                if (!proceed) {
+                    return;
+                }
+            }
+            
+            // Collect form data
+            const age = parseInt(document.getElementById('age').value);
+            const sex = document.getElementById('sex').value;
+            const hr = parseInt(document.getElementById('heart-rate').value);
+            const rr = parseInt(document.getElementById('resp-rate').value);
+            const bpSys = parseInt(document.getElementById('bp-systolic').value);
+            const bpDia = parseInt(document.getElementById('bp-diastolic').value);
+            const spo2 = parseInt(document.getElementById('spo2').value);
+            const tempValue = document.getElementById('temperature').value;
+            const temperature = tempValue ? parseFloat(tempValue) : null;
+            const chiefComplaintCategory = document.getElementById('chief-complaint').value;
+            const arrivalMode = document.getElementById('arrival-mode').value;
+            const mentalStatus = document.getElementById('mental-status').value;
+            const painScoreValue = document.getElementById('pain-score').value;
+            const painScore = painScoreValue ? parseInt(painScoreValue) : null;
+            const medicalHistory = document.getElementById('medical-history').value;
+            
+            // Prepare request payload (flat structure to match API)
+            const patientData = {
+                age: age,
+                sex: sex,
+                hr: hr,
+                bp_systolic: bpSys,
+                bp_diastolic: bpDia,
+                spo2: spo2,
+                rr: rr,
+                temperature: temperature,
+                chief_complaint: chiefComplaintCategory, // Use category as chief complaint
+                chief_complaint_category: chiefComplaintCategory,
+                arrival_mode: arrivalMode,
+                mental_status: mentalStatus,
+                pain_score: painScore,
+                symptoms: [], // Empty array for now
+                medical_history: {} // Empty object for now (would need to parse the textarea)
+            };
+            
+            console.log('📤 Submitting patient data:', patientData);
+            console.log('Data completeness:', calculateDataCompleteness() + '%');
+            
+            // Show loading state
+            document.getElementById('recommendation-placeholder').style.display = 'none';
+            document.getElementById('recommendation-content').classList.remove('active');
+            document.getElementById('loading-spinner').classList.add('active');
+            
+            try {
+                // Call API
+                const predictionResponse = await submitPatientData(patientData);
+                
+                console.log('✅ Received prediction:', predictionResponse);
+                
+                // Store current prediction for override dialog
+                currentPredictionResponse = predictionResponse;
+                
+                // Display results
+                displayRecommendation(predictionResponse);
+                
+                // Show "View in Queue" button
+                showViewInQueueButton();
+                
+            } catch (error) {
+                // Hide loading spinner
+                document.getElementById('loading-spinner').classList.remove('active');
+                
+                // Show error message
+                alert(
+                    '❌ Error Getting AI Recommendation\n\n' +
+                    `${error.message}\n\n` +
+                    'ML prediction unavailable, defaulting to manual triage.\n' +
+                    'Please assess patient manually or try again.'
+                );
+                
+                console.error('Prediction error:', error);
+                
+                // Show placeholder again
+                document.getElementById('recommendation-placeholder').style.display = 'flex';
+            }
+        });
+        
+        // Show "View in Queue" button after successful prediction
+        function showViewInQueueButton() {
+            const recommendationContent = document.getElementById('recommendation-content');
+            
+            // Remove existing button if any
+            const existingBtn = document.getElementById('view-in-queue-btn');
+            if (existingBtn) existingBtn.remove();
+            
+            // Create button
+            const button = document.createElement('div');
+            button.id = 'view-in-queue-btn';
+            button.style.cssText = 'margin-top: 1.5rem; padding: 1rem; background: linear-gradient(135deg, #1976d2 0%, #1565c0 100%); border-radius: 8px; text-align: center;';
+            button.innerHTML = `
+                <button onclick="navigateToQueue()" style="
+                    width: 100%;
+                    padding: 0.75rem 1.5rem;
+                    background: white;
+                    color: #1976d2;
+                    border: none;
+                    border-radius: 4px;
+                    font-size: 1rem;
+                    font-weight: 600;
+                    cursor: pointer;
+                    transition: all 0.2s;
+                " onmouseover="this.style.background='#e3f2fd'" onmouseout="this.style.background='white'">
+                    📋 View Patient in ED Queue
+                </button>
+            `;
+            recommendationContent.appendChild(button);
+        }
+        
+        // Navigate to queue dashboard
+        function navigateToQueue() {
+            // Navigate to queue with refresh parameter
+            window.location.href = 'queue.html?refresh=true';
+        }
+        
+        // ============================================================
+        // TASK 5.5: Demo Patient Quick-Load Functionality
+        // ============================================================
+        
+        let testPatients = []; // Store loaded test patients
+        
+        // Load test patients from backend on page load
+        async function loadTestPatients() {
+            try {
+                const response = await fetch('http://localhost:8000/api/v1/patients');
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
+                const data = await response.json();
+                testPatients = data.patients;
+                
+                console.log(`✅ Loaded ${testPatients.length} test patients`);
+                
+                // Populate dropdown
+                populateDemoPatientDropdown(testPatients);
+                
+            } catch (error) {
+                console.error('❌ Error loading test patients:', error);
+                // Show error in dropdown
+                const dropdown = document.getElementById('demo-patient-selector');
+                dropdown.innerHTML = '<option value="">Error loading patients</option>';
+            }
+        }
+        
+        // Populate demo patient dropdown with labels for special cases
+        function populateDemoPatientDropdown(patients) {
+            const dropdown = document.getElementById('demo-patient-selector');
+            
+            // Clear existing options except the first one
+            dropdown.innerHTML = '<option value="">-- Load Test Patient --</option>';
+            
+            patients.forEach((patient, index) => {
+                const option = document.createElement('option');
+                option.value = patient.patient_id;
+                
+                // Build display name with special labels
+                let displayName = `${index + 1}. ${patient.name} (${patient.demographics.age}yo, ${patient.demographics.sex})`;
+                
+                // Add special case labels
+                const labels = [];
+                
+                // PEDIATRIC label
+                if (patient.demographics.age < 18) {
+                    labels.push('PEDIATRIC');
+                }
+                
+                // GERIATRIC label
+                if (patient.demographics.age >= 65) {
+                    labels.push('GERIATRIC');
+                }
+                
+                // AMBIGUOUS label - check for ambiguous chest pain scenario
+                if (patient.patient_id === 'd91729c4-6761-4445-bd98-d385d690077b' || 
+                    (patient.clinical.chief_complaint_category === 'chest_pain_cardiac' && 
+                     patient.demographics.age >= 40 && patient.demographics.age <= 50)) {
+                    labels.push('AMBIGUOUS');
+                }
+                
+                // ZERO-HISTORY label - check if medical history is empty or minimal
+                if (!patient.medical_history || Object.keys(patient.medical_history).length === 0 ||
+                    (Object.keys(patient.medical_history).length === 1 && !Object.values(patient.medical_history)[0])) {
+                    labels.push('ZERO-HISTORY');
+                }
+                
+                // Add labels to display name
+                if (labels.length > 0) {
+                    displayName += ` [${labels.join(', ')}]`;
+                }
+                
+                // Add chief complaint for context
+                const complaint = patient.clinical.chief_complaint_category.replace(/_/g, ' ');
+                displayName += ` - ${complaint.charAt(0).toUpperCase() + complaint.slice(1)}`;
+                
+                option.textContent = displayName;
+                dropdown.appendChild(option);
+            });
+            
+            console.log(`✅ Populated dropdown with ${patients.length} patients`);
+        }
+        
+        // Auto-populate form when demo patient is selected
+        function autoPopulateForm(patientId) {
+            const patient = testPatients.find(p => p.patient_id === patientId);
+            
+            if (!patient) {
+                console.error('Patient not found:', patientId);
+                return;
+            }
+            
+            console.log('📋 Auto-populating form for patient:', patient.name);
+            
+            // Patient Name
+            document.getElementById('patient-name').value = patient.name;
+            
+            // Demographics
+            document.getElementById('age').value = patient.demographics.age;
+            document.getElementById('sex').value = patient.demographics.sex;
+            
+            // Trigger age group update
+            updateAgeGroupDisplay(patient.demographics.age);
+            
+            // Vitals
+            document.getElementById('heart-rate').value = patient.vitals.hr || '';
+            document.getElementById('resp-rate').value = patient.vitals.rr || '';
+            document.getElementById('bp-systolic').value = patient.vitals.bp_systolic || '';
+            document.getElementById('bp-diastolic').value = patient.vitals.bp_diastolic || '';
+            document.getElementById('spo2').value = patient.vitals.spo2 || '';
+            document.getElementById('temperature').value = patient.vitals.temperature || '';
+            
+            // Clinical Information
+            document.getElementById('chief-complaint').value = patient.clinical.chief_complaint_category || '';
+            document.getElementById('arrival-mode').value = patient.clinical.arrival_mode || 'walk_in';
+            document.getElementById('mental-status').value = patient.clinical.mental_status || 'alert';
+            document.getElementById('pain-score').value = patient.clinical.pain_score || '';
+            
+            // Medical History - format as readable text
+            let historyText = '';
+            if (patient.medical_history && Object.keys(patient.medical_history).length > 0) {
+                const historyItems = [];
+                for (const [key, value] of Object.entries(patient.medical_history)) {
+                    if (value === true) {
+                        const readable = key.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+                        historyItems.push(readable);
+                    }
+                }
+                if (historyItems.length > 0) {
+                    historyText = historyItems.join(', ');
+                }
+            }
+            document.getElementById('medical-history').value = historyText;
+            
+            // Update data completeness display
+            calculateDataCompleteness();
+            
+            // Scroll to top of form to show the populated data
+            document.querySelector('.left-sidebar').scrollTop = 0;
+            
+            console.log('✅ Form auto-populated successfully');
+            
+            // Show info message about special labels
+            const labels = [];
+            if (patient.demographics.age < 18) labels.push('PEDIATRIC');
+            if (patient.demographics.age >= 65) labels.push('GERIATRIC');
+            if (patient.patient_id === 'd91729c4-6761-4445-bd98-d385d690077b') labels.push('AMBIGUOUS');
+            if (!patient.medical_history || Object.keys(patient.medical_history).length === 0) labels.push('ZERO-HISTORY');
+            
+            if (labels.length > 0) {
+                console.log(`ℹ️ Special case: ${labels.join(', ')}`);
+            }
+        }
+        
+        // Demo patient selector change handler
+        document.getElementById('demo-patient-selector').addEventListener('change', function(e) {
+            const patientId = e.target.value;
+            
+            if (patientId) {
+                autoPopulateForm(patientId);
+            } else {
+                // If "-- Load Test Patient --" is selected, clear the form
+                console.log('Clearing form');
+                document.getElementById('patient-intake-form').reset();
+                document.getElementById('age-group-badge').style.display = 'none';
+                calculateDataCompleteness();
+            }
+        });
+        
+        // Load test patients when page loads
+        window.addEventListener('DOMContentLoaded', function() {
+            console.log('🔄 Loading test patients...');
+            loadTestPatients();
+        });
+        
+        // Accept button - Save patient with ML recommendation
+        document.getElementById('accept-btn').addEventListener('click', async function() {
+            if (!currentPredictionResponse) {
+                alert('No prediction available to accept');
+                return;
+            }
+            
+            try {
+                // Show loading state
+                this.disabled = true;
+                this.textContent = 'Saving...';
+                
+                // Get patient data from form
+                const patientName = document.getElementById('patient-name').value;
+                const patientData = {
+                    age: parseInt(document.getElementById('age').value),
+                    sex: document.getElementById('sex').value,
+                    hr: parseInt(document.getElementById('heart-rate').value),
+                    bp_systolic: parseInt(document.getElementById('bp-systolic').value),
+                    bp_diastolic: parseInt(document.getElementById('bp-diastolic').value),
+                    spo2: parseInt(document.getElementById('spo2').value),
+                    rr: parseInt(document.getElementById('resp-rate').value),
+                    temperature: document.getElementById('temperature').value ? parseFloat(document.getElementById('temperature').value) : null,
+                    chief_complaint: document.getElementById('chief-complaint').options[document.getElementById('chief-complaint').selectedIndex].text,
+                    chief_complaint_category: document.getElementById('chief-complaint').value,
+                    arrival_mode: document.getElementById('arrival-mode').value,
+                    mental_status: document.getElementById('mental-status').value,
+                    pain_score: document.getElementById('pain-score').value ? parseInt(document.getElementById('pain-score').value) : null,
+                    symptoms: [],
+                    medical_history: {}
+                };
+                
+                // Call API to save patient with ML recommendation as ground truth
+                const mlESI = currentPredictionResponse.esi_prediction;
+                const response = await fetch(
+                    `http://localhost:8000/api/v1/patients?patient_name=${encodeURIComponent(patientName)}&clinician_override_esi=${mlESI}`,
+                    {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(patientData)
+                    }
+                );
+                
+                if (!response.ok) {
+                    throw new Error(`Failed to save patient: ${response.status}`);
+                }
+                
+                const result = await response.json();
+                
+                // Show success message
+                alert(
+                    `✅ Patient Added to Queue\n\n` +
+                    `Patient: ${result.patient_name}\n` +
+                    `ML Recommended ESI: ${currentPredictionResponse.esi_prediction}\n` +
+                    `Patient ID: ${result.patient_id}\n\n` +
+                    `The patient has been added to the ED queue.`
+                );
+                
+                // Navigate to queue dashboard
+                window.location.href = 'queue.html?refresh=true';
+                
+            } catch (error) {
+                console.error('Error saving patient:', error);
+                alert(`Error saving patient: ${error.message}`);
+                
+                // Reset button state
+                this.disabled = false;
+                this.textContent = 'Accept Recommendation';
+            }
+        });
+        
+        // Override button - Open override dialog modal
+        document.getElementById('override-btn').addEventListener('click', function() {
+            openOverrideDialog();
+        });
+        
+        // Global variable to store current prediction response
+        let currentPredictionResponse = null;
+        
+        // Open override dialog modal
+        function openOverrideDialog() {
+            if (!currentPredictionResponse) {
+                alert('No prediction available to override');
+                return;
+            }
+            
+            const modal = document.getElementById('override-modal');
+            modal.style.display = 'flex';
+            
+            // Set ML predicted ESI
+            document.getElementById('ml-predicted-esi-value').textContent = currentPredictionResponse.esi_prediction;
+            document.getElementById('ml-confidence-value').textContent = 
+                `${currentPredictionResponse.confidence_breakdown.level} (${currentPredictionResponse.confidence_breakdown.overall.toFixed(0)}%)`;
+            
+            // Set default clinician ESI to match ML prediction
+            document.getElementById('clinician-esi-' + currentPredictionResponse.esi_prediction).checked = true;
+            
+            // Update comparison display
+            updateOverrideComparison();
+        }
+        
+        // Close override dialog modal
+        function closeOverrideDialog() {
+            const modal = document.getElementById('override-modal');
+            modal.style.display = 'none';
+            
+            // Reset form
+            document.getElementById('override-form').reset();
+        }
+        
+        // Update override comparison (direction and color coding)
+        function updateOverrideComparison() {
+            if (!currentPredictionResponse) return;
+            
+            const mlESI = currentPredictionResponse.esi_prediction;
+            const clinicianESI = parseInt(document.querySelector('input[name="clinician-esi"]:checked')?.value || mlESI);
+            
+            // Update clinician decision display
+            document.getElementById('clinician-esi-value').textContent = clinicianESI;
+            
+            // Calculate direction
+            let direction = '';
+            let directionClass = '';
+            const clinicianDecisionBox = document.getElementById('clinician-decision-box');
+            
+            if (clinicianESI < mlESI) {
+                direction = '⬆️ Escalation (higher urgency)';
+                directionClass = 'esi-1'; // Red
+            } else if (clinicianESI > mlESI) {
+                direction = '⬇️ De-escalation (lower urgency)';
+                directionClass = 'esi-3'; // Yellow
+            } else {
+                direction = '✅ Agreement';
+                directionClass = 'esi-4'; // Green
+            }
+            
+            document.getElementById('override-direction').textContent = direction;
+            
+            // Update styling
+            clinicianDecisionBox.className = 'decision-box ' + directionClass;
+        }
+        
+        // Submit override to backend
+        async function submitOverride() {
+            if (!currentPredictionResponse) {
+                alert('No prediction available to override');
+                return;
+            }
+            
+            const mlESI = currentPredictionResponse.esi_prediction;
+            const clinicianESI = parseInt(document.querySelector('input[name="clinician-esi"]:checked')?.value || mlESI);
+            const reasonCategory = document.getElementById('override-reason-category').value;
+            const reasonText = document.getElementById('override-reason-text').value.trim();
+            const clinicianId = document.getElementById('clinician-id').value.trim();
+            
+            // Validate form
+            if (!reasonCategory) {
+                alert('Please select a reason category');
+                return;
+            }
+            
+            if (!reasonText || reasonText.length < 20) {
+                alert('Please provide a detailed reason (minimum 20 characters)');
+                return;
+            }
+            
+            if (!clinicianId) {
+                alert('Please enter your clinician ID or name');
+                return;
+            }
+            
+            // Calculate override direction
+            let overrideDirection = '';
+            if (clinicianESI < mlESI) {
+                overrideDirection = 'escalation';
+            } else if (clinicianESI > mlESI) {
+                overrideDirection = 'de-escalation';
+            } else {
+                overrideDirection = 'agreement';
+            }
+            
+            // Show escalation warning if escalating
+            if (overrideDirection === 'escalation') {
+                const confirmEscalation = confirm(
+                    `⚠️ Escalation Notice\n\n` +
+                    `You are escalating from ESI ${mlESI} to ESI ${clinicianESI}.\n` +
+                    `This will allocate additional resources and reduce wait time.\n\n` +
+                    `Do you want to proceed?`
+                );
+                
+                if (!confirmEscalation) {
+                    return;
+                }
+            }
+            
+            // Prepare override request payload (only fields required by backend)
+            const overridePayload = {
+                patient_id: "temp_" + Date.now(), // Temporary ID until patient is saved
+                ml_predicted_esi: mlESI,
+                clinician_final_esi: clinicianESI,
+                reason_category: reasonCategory,
+                reason_text: reasonText,
+                clinician_id: clinicianId,
+                timestamp: new Date().toISOString()
+            };
+            
+            try {
+                // Show loading state
+                const submitButton = document.getElementById('submit-override-btn');
+                submitButton.disabled = true;
+                submitButton.textContent = 'Submitting...';
+                
+                // POST to /api/v1/override endpoint
+                const response = await fetch('http://localhost:8000/api/v1/override', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(overridePayload)
+                });
+                
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.detail || 'Failed to submit override');
+                }
+                
+                const result = await response.json();
+                
+                // Now save the patient to the queue with the clinician's final ESI
+                const patientName = document.getElementById('patient-name').value;
+                const patientData = {
+                    age: parseInt(document.getElementById('age').value),
+                    sex: document.getElementById('sex').value,
+                    hr: parseInt(document.getElementById('heart-rate').value),
+                    bp_systolic: parseInt(document.getElementById('bp-systolic').value),
+                    bp_diastolic: parseInt(document.getElementById('bp-diastolic').value),
+                    spo2: parseInt(document.getElementById('spo2').value),
+                    rr: parseInt(document.getElementById('resp-rate').value),
+                    temperature: document.getElementById('temperature').value ? parseFloat(document.getElementById('temperature').value) : null,
+                    chief_complaint: document.getElementById('chief-complaint').options[document.getElementById('chief-complaint').selectedIndex].text,
+                    chief_complaint_category: document.getElementById('chief-complaint').value,
+                    arrival_mode: document.getElementById('arrival-mode').value,
+                    mental_status: document.getElementById('mental-status').value,
+                    pain_score: document.getElementById('pain-score').value ? parseInt(document.getElementById('pain-score').value) : null,
+                    symptoms: [],
+                    medical_history: {}
+                };
+                
+                // Save patient to queue with clinician's overridden ESI
+                const patientResponse = await fetch(
+                    `http://localhost:8000/api/v1/patients?patient_name=${encodeURIComponent(patientName)}&clinician_override_esi=${clinicianESI}`,
+                    {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(patientData)
+                    }
+                );
+                
+                if (!patientResponse.ok) {
+                    throw new Error('Failed to save patient to queue');
+                }
+                
+                const patientResult = await patientResponse.json();
+                
+                // Update the override record with the actual patient_id
+                overridePayload.patient_id = patientResult.patient_id;
+                
+                // Re-submit override with correct patient_id
+                const overrideUpdateResponse = await fetch('http://localhost:8000/api/v1/override', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(overridePayload)
+                });
+                
+                if (!overrideUpdateResponse.ok) {
+                    console.error('Failed to update override with patient_id, but patient was saved');
+                }
+                
+                // Show success message
+                alert(
+                    `✅ Override Logged and Patient Added to Queue\n\n` +
+                    `ML Predicted: ESI ${mlESI}\n` +
+                    `Your Decision: ESI ${clinicianESI}\n` +
+                    `Direction: ${overrideDirection}\n\n` +
+                    `Override ID: ${result.override_id}\n` +
+                    `Patient: ${patientResult.patient_name}\n` +
+                    `Patient ID: ${patientResult.patient_id}\n\n` +
+                    `Override logged to audit trail and patient added to ED queue.`
+                );
+                
+                // Close dialog and navigate to queue
+                closeOverrideDialog();
+                window.location.href = 'queue.html?refresh=true';
+                
+            } catch (error) {
+                console.error('Override submission error:', error);
+                alert(`Error submitting override: ${error.message}`);
+            } finally {
+                // Reset button state
+                const submitButton = document.getElementById('submit-override-btn');
+                submitButton.disabled = false;
+                submitButton.textContent = 'Submit Override';
+            }
+        }
+        
+        // Initialize on page load
+        calculateDataCompleteness();
+    </script>
+    
+    <!-- Override Dialog Modal -->
+    <div id="override-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.5); z-index: 1000; align-items: center; justify-content: center;">
+        <div style="background-color: white; border-radius: 8px; max-width: 800px; width: 90%; max-height: 90vh; overflow-y: auto; box-shadow: 0 4px 20px rgba(0,0,0,0.3);">
+            <!-- Modal Header -->
+            <div style="padding: 1.5rem; border-bottom: 2px solid var(--border-color); display: flex; justify-content: space-between; align-items: center;">
+                <h2 style="margin: 0; font-size: 1.5rem;">Override AI Recommendation</h2>
+                <button onclick="closeOverrideDialog()" style="background: none; border: none; font-size: 1.5rem; cursor: pointer; color: var(--text-secondary);">&times;</button>
+            </div>
+            
+            <!-- Modal Body -->
+            <div style="padding: 1.5rem;">
+                <form id="override-form">
+                    <!-- Side-by-Side Comparison -->
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1.5rem;">
+                        <!-- ML Recommendation Box -->
+                        <div class="decision-box" style="padding: 1.5rem; border-radius: 8px; background-color: #e3f2fd; border: 2px solid #1976d2;">
+                            <h3 style="margin: 0 0 0.5rem 0; font-size: 1rem; color: var(--text-secondary);">ML Recommendation</h3>
+                            <div style="font-size: 2.5rem; font-weight: bold; margin-bottom: 0.5rem;">
+                                ESI <span id="ml-predicted-esi-value">-</span>
+                            </div>
+                            <div style="font-size: 0.9rem; color: var(--text-secondary);">
+                                Confidence: <span id="ml-confidence-value">-</span>
+                            </div>
+                        </div>
+                        
+                        <!-- Clinician Decision Box -->
+                        <div id="clinician-decision-box" class="decision-box esi-4" style="padding: 1.5rem; border-radius: 8px;">
+                            <h3 style="margin: 0 0 0.5rem 0; font-size: 1rem;">Your Decision</h3>
+                            <div style="font-size: 2.5rem; font-weight: bold; margin-bottom: 0.5rem;">
+                                ESI <span id="clinician-esi-value">-</span>
+                            </div>
+                            <div style="font-size: 0.9rem;">
+                                <span id="override-direction">-</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- ESI Level Selector -->
+                    <div style="margin-bottom: 1.5rem;">
+                        <label style="display: block; font-weight: 600; margin-bottom: 0.75rem; font-size: 1rem;">Select Final ESI Level <span style="color: var(--esi-1-red);">*</span></label>
+                        <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
+                            <label style="display: flex; align-items: center; padding: 0.75rem 1rem; border: 2px solid var(--border-color); border-radius: 4px; cursor: pointer; transition: all 0.2s;">
+                                <input type="radio" name="clinician-esi" id="clinician-esi-1" value="1" onchange="updateOverrideComparison()" style="margin-right: 0.5rem;">
+                                <span style="font-weight: 600;">ESI 1</span>
+                            </label>
+                            <label style="display: flex; align-items: center; padding: 0.75rem 1rem; border: 2px solid var(--border-color); border-radius: 4px; cursor: pointer; transition: all 0.2s;">
+                                <input type="radio" name="clinician-esi" id="clinician-esi-2" value="2" onchange="updateOverrideComparison()" style="margin-right: 0.5rem;">
+                                <span style="font-weight: 600;">ESI 2</span>
+                            </label>
+                            <label style="display: flex; align-items: center; padding: 0.75rem 1rem; border: 2px solid var(--border-color); border-radius: 4px; cursor: pointer; transition: all 0.2s;">
+                                <input type="radio" name="clinician-esi" id="clinician-esi-3" value="3" onchange="updateOverrideComparison()" style="margin-right: 0.5rem;">
+                                <span style="font-weight: 600;">ESI 3</span>
+                            </label>
+                            <label style="display: flex; align-items: center; padding: 0.75rem 1rem; border: 2px solid var(--border-color); border-radius: 4px; cursor: pointer; transition: all 0.2s;">
+                                <input type="radio" name="clinician-esi" id="clinician-esi-4" value="4" onchange="updateOverrideComparison()" style="margin-right: 0.5rem;">
+                                <span style="font-weight: 600;">ESI 4</span>
+                            </label>
+                            <label style="display: flex; align-items: center; padding: 0.75rem 1rem; border: 2px solid var(--border-color); border-radius: 4px; cursor: pointer; transition: all 0.2s;">
+                                <input type="radio" name="clinician-esi" id="clinician-esi-5" value="5" onchange="updateOverrideComparison()" style="margin-right: 0.5rem;">
+                                <span style="font-weight: 600;">ESI 5</span>
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <!-- Override Reason Category -->
+                    <div style="margin-bottom: 1.5rem;">
+                        <label for="override-reason-category" style="display: block; font-weight: 600; margin-bottom: 0.5rem; font-size: 1rem;">Override Reason Category <span style="color: var(--esi-1-red);">*</span></label>
+                        <select id="override-reason-category" required style="width: 100%; padding: 0.75rem; border: 1px solid var(--border-color); border-radius: 4px; font-size: 1rem; font-family: inherit;">
+                            <option value="">-- Select Reason --</option>
+                            <option value="clinical_judgment">Clinical Judgment</option>
+                            <option value="additional_information">Additional Information Not Available to AI</option>
+                            <option value="safety_concern">Safety Concern</option>
+                            <option value="ml_error">AI Error / Incorrect Assessment</option>
+                            <option value="patient_preference">Patient Preference</option>
+                            <option value="resource_constraint">Resource Constraint</option>
+                        </select>
+                    </div>
+                    
+                    <!-- Override Reason Text -->
+                    <div style="margin-bottom: 1.5rem;">
+                        <label for="override-reason-text" style="display: block; font-weight: 600; margin-bottom: 0.5rem; font-size: 1rem;">Detailed Reason (minimum 20 characters) <span style="color: var(--esi-1-red);">*</span></label>
+                        <textarea id="override-reason-text" required minlength="20" rows="4" placeholder="Explain your clinical reasoning for this override..." style="width: 100%; padding: 0.75rem; border: 1px solid var(--border-color); border-radius: 4px; font-size: 1rem; font-family: inherit; resize: vertical;"></textarea>
+                        <small style="display: block; margin-top: 0.25rem; color: var(--text-secondary); font-size: 0.85rem;">
+                            Character count: <span id="reason-text-count">0</span> / 20 minimum
+                        </small>
+                    </div>
+                    
+                    <!-- Clinician ID -->
+                    <div style="margin-bottom: 1.5rem;">
+                        <label for="clinician-id" style="display: block; font-weight: 600; margin-bottom: 0.5rem; font-size: 1rem;">Clinician ID / Name <span style="color: var(--esi-1-red);">*</span></label>
+                        <input type="text" id="clinician-id" required placeholder="e.g., Dr. Jane Smith, Nurse ID: NS-1234" style="width: 100%; padding: 0.75rem; border: 1px solid var(--border-color); border-radius: 4px; font-size: 1rem; font-family: inherit;">
+                        <small style="display: block; margin-top: 0.25rem; color: var(--text-secondary); font-size: 0.85rem;">
+                            Enter your name or staff ID for audit trail accountability
+                        </small>
+                    </div>
+                    
+                    <!-- Action Buttons -->
+                    <div style="display: flex; gap: 1rem; justify-content: flex-end;">
+                        <button type="button" onclick="closeOverrideDialog()" style="padding: 0.75rem 1.5rem; background-color: var(--text-secondary); color: white; border: none; border-radius: 4px; font-size: 1rem; font-weight: 600; cursor: pointer;">
+                            Cancel
+                        </button>
+                        <button type="button" id="submit-override-btn" onclick="submitOverride()" style="padding: 0.75rem 1.5rem; background-color: var(--esi-2-orange); color: white; border: none; border-radius: 4px; font-size: 1rem; font-weight: 600; cursor: pointer;">
+                            Submit Override
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // Update character count for reason text
+        document.getElementById('override-reason-text').addEventListener('input', function(e) {
+            const count = e.target.value.length;
+            document.getElementById('reason-text-count').textContent = count;
+            
+            // Update color based on length
+            const countSpan = document.getElementById('reason-text-count');
+            if (count < 20) {
+                countSpan.style.color = 'var(--esi-1-red)';
+            } else {
+                countSpan.style.color = 'var(--esi-4-green)';
+            }
+        });
+    </script>
+</body>
+</html>

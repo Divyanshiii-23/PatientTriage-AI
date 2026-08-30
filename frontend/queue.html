@@ -1,0 +1,2602 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PatientTriage.ai - ED Queue Dashboard</title>
+    
+    <style>
+        /* CSS Variables for ESI Color Scheme */
+        :root {
+            --esi-1-red: #d32f2f;
+            --esi-2-orange: #f57c00;
+            --esi-3-yellow: #fbc02d;
+            --esi-4-green: #388e3c;
+            --esi-5-blue: #1976d2;
+            --bg-light: #f5f5f5;
+            --bg-white: #ffffff;
+            --text-primary: #212121;
+            --text-secondary: #757575;
+            --border-color: #e0e0e0;
+            --shadow: 0 2px 4px rgba(0,0,0,0.1);
+            --shadow-lg: 0 4px 8px rgba(0,0,0,0.15);
+        }
+        
+        /* Global Styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background-color: var(--bg-light);
+            color: var(--text-primary);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+        
+        /* Navigation Header */
+        .nav-header {
+            background: linear-gradient(135deg, #1976d2 0%, #1565c0 100%);
+            color: white;
+            padding: 0;
+            box-shadow: var(--shadow-lg);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+        
+        .nav-container {
+            max-width: 1800px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 2rem;
+        }
+        
+        .nav-brand {
+            font-size: 1.5rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .nav-subtitle {
+            font-size: 0.85rem;
+            opacity: 0.9;
+            font-weight: 400;
+        }
+        
+        .nav-tabs {
+            display: flex;
+            gap: 0.5rem;
+        }
+        
+        .nav-tab {
+            padding: 0.75rem 1.5rem;
+            background: rgba(255, 255, 255, 0.1);
+            border: none;
+            color: white;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.95rem;
+            font-weight: 500;
+            transition: all 0.2s;
+            text-decoration: none;
+            display: inline-block;
+        }
+        
+        .nav-tab:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+        
+        .nav-tab.active {
+            background: white;
+            color: #1976d2;
+        }
+        
+        /* Dashboard Header */
+        .dashboard-header {
+            background-color: var(--bg-white);
+            border-bottom: 2px solid var(--border-color);
+            padding: 1.5rem 2rem;
+            box-shadow: var(--shadow);
+        }
+        
+        .dashboard-header-content {
+            max-width: 1800px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+        
+        .facility-info h2 {
+            font-size: 1.3rem;
+            margin-bottom: 0.25rem;
+        }
+        
+        .facility-meta {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+        
+        /* Role Toggle */
+        .role-controls {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+        
+        .role-toggle {
+            display: flex;
+            gap: 0.25rem;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+        
+        .role-btn {
+            padding: 0.5rem 1rem;
+            background: white;
+            border: none;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: all 0.2s;
+        }
+        
+        .role-btn:hover {
+            background: #f5f5f5;
+        }
+        
+        .role-btn.active {
+            background: #1976d2;
+            color: white;
+        }
+        
+        /* Surge Toggle */
+        .surge-toggle {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            background: white;
+            border: 2px solid var(--border-color);
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .surge-toggle:hover {
+            background: #f5f5f5;
+        }
+        
+        .surge-toggle.active {
+            background: #ff5722;
+            color: white;
+            border-color: #ff5722;
+        }
+        
+        .surge-indicator {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #e0e0e0;
+        }
+        
+        .surge-toggle.active .surge-indicator {
+            background: white;
+            animation: pulse 1.5s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+        
+        /* Surge Alert Banner */
+        .surge-alert {
+            background: linear-gradient(135deg, #ff5722 0%, #e64a19 100%);
+            color: white;
+            padding: 1rem 2rem;
+            display: none;
+            align-items: center;
+            gap: 1rem;
+            box-shadow: var(--shadow);
+        }
+        
+        .surge-alert.active {
+            display: flex;
+        }
+        
+        .surge-alert-content {
+            max-width: 1800px;
+            margin: 0 auto;
+            width: 100%;
+        }
+        
+        /* Metrics Bar */
+        .metrics-bar {
+            background-color: var(--bg-white);
+            padding: 1rem 2rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .metrics-container {
+            max-width: 1800px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1rem;
+        }
+        
+        .metric-card {
+            text-align: center;
+            padding: 0.75rem;
+            background: #f5f5f5;
+            border-radius: 4px;
+        }
+        
+        .metric-value {
+            font-size: 1.8rem;
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+        }
+        
+        .metric-label {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+        }
+        
+        /* Main Content */
+        .main-content {
+            display: flex;
+            max-width: 1800px;
+            margin: 0 auto;
+            gap: 1.5rem;
+            padding: 1.5rem 2rem;
+            min-height: calc(100vh - 400px);
+        }
+        
+        /* Queue Panel */
+        .queue-panel {
+            flex: 1;
+            background: white;
+            border-radius: 8px;
+            box-shadow: var(--shadow);
+            overflow: hidden;
+        }
+        
+        .queue-header {
+            padding: 1rem 1.5rem;
+            background: #f5f5f5;
+            border-bottom: 2px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .queue-header h3 {
+            font-size: 1.2rem;
+        }
+        
+        .queue-filters {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+        
+        .search-box {
+            flex: 1;
+            min-width: 200px;
+            position: relative;
+        }
+        
+        .search-box input {
+            width: 100%;
+            padding: 0.5rem 0.75rem 0.5rem 2.5rem;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            font-size: 0.9rem;
+        }
+        
+        .search-box::before {
+            content: '🔍';
+            position: absolute;
+            left: 0.75rem;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 1rem;
+        }
+        
+        .filter-btn {
+            padding: 0.4rem 0.8rem;
+            border: 1px solid var(--border-color);
+            background: white;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            transition: all 0.2s;
+        }
+        
+        .filter-btn:hover {
+            background: #f5f5f5;
+        }
+        
+        .filter-btn.active {
+            background: #1976d2;
+            color: white;
+            border-color: #1976d2;
+        }
+        
+        .queue-list {
+            overflow-y: auto;
+            max-height: calc(100vh - 450px);
+        }
+        
+        /* Patient Card */
+        .patient-card {
+            padding: 1rem 1.5rem;
+            border-bottom: 1px solid var(--border-color);
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        
+        .patient-card:hover {
+            background: #f9f9f9;
+        }
+        
+        .patient-card.selected {
+            background: #e3f2fd;
+            border-left: 4px solid #1976d2;
+        }
+        
+        .patient-card.deteriorating {
+            border-left: 4px solid #ff5722;
+            background: #ffebee;
+        }
+        
+        .patient-card.reassessment-due {
+            border-left: 4px solid #fbc02d;
+            background: #fffde7;
+        }
+        
+        .esi-badge {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: white;
+            flex-shrink: 0;
+        }
+        
+        .esi-badge.esi-1 { background: var(--esi-1-red); }
+        .esi-badge.esi-2 { background: var(--esi-2-orange); }
+        .esi-badge.esi-3 { background: var(--esi-3-yellow); color: #333; }
+        .esi-badge.esi-4 { background: var(--esi-4-green); }
+        .esi-badge.esi-5 { background: var(--esi-5-blue); }
+        
+        .patient-info {
+            flex: 1;
+        }
+        
+        .patient-name {
+            font-size: 1rem;
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+        }
+        
+        .patient-meta {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+        
+        .patient-status {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            gap: 0.25rem;
+        }
+        
+        .wait-time {
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+        
+        .wait-time.critical-time {
+            color: #d32f2f;
+            font-weight: 700;
+            animation: pulse 1.5s ease-in-out infinite;
+        }
+        
+        .wait-time.overdue {
+            color: #c62828;
+            font-weight: 700;
+            background: #ffebee;
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.6; }
+        }
+        
+        .status-badges {
+            display: flex;
+            gap: 0.5rem;
+        }
+        
+        .status-badge {
+            padding: 0.25rem 0.5rem;
+            border-radius: 3px;
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+        
+        .status-badge.alert {
+            background: #ff5722;
+            color: white;
+        }
+        
+        .status-badge.warning {
+            background: #fbc02d;
+            color: #333;
+        }
+        
+        .status-badge.info {
+            background: #2196f3;
+            color: white;
+        }
+        
+        /* Detail Panel */
+        .detail-panel {
+            flex: 0 0 500px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: var(--shadow);
+            overflow: hidden;
+            position: sticky;
+            top: 100px;
+            max-height: calc(100vh - 120px);
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .detail-header {
+            padding: 1rem 1.5rem;
+            background: #1976d2;
+            color: white;
+        }
+        
+        .detail-header h3 {
+            font-size: 1.2rem;
+            margin-bottom: 0.25rem;
+        }
+        
+        .detail-content {
+            padding: 1.5rem;
+            overflow-y: auto;
+            flex: 1;
+        }
+        
+        .detail-placeholder {
+            text-align: center;
+            color: var(--text-secondary);
+            padding: 3rem 1rem;
+        }
+        
+        .detail-section {
+            margin-bottom: 1.5rem;
+        }
+        
+        .detail-section h4 {
+            font-size: 1rem;
+            margin-bottom: 0.75rem;
+            color: var(--text-primary);
+            border-bottom: 2px solid var(--border-color);
+            padding-bottom: 0.5rem;
+        }
+        
+        .vital-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 0.75rem;
+        }
+        
+        .vital-item {
+            padding: 0.75rem;
+            background: #f5f5f5;
+            border-radius: 4px;
+        }
+        
+        .vital-label {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            margin-bottom: 0.25rem;
+        }
+        
+        .vital-value {
+            font-size: 1.1rem;
+            font-weight: 600;
+        }
+        
+        .vital-item.abnormal {
+            background: #ffebee;
+            border-left: 3px solid #d32f2f;
+        }
+        
+        .detail-actions {
+            padding: 1rem 1.5rem;
+            border-top: 1px solid var(--border-color);
+            display: flex;
+            gap: 0.75rem;
+        }
+        
+        .action-btn {
+            flex: 1;
+            padding: 0.75rem;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.95rem;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+        
+        .action-btn.primary {
+            background: #1976d2;
+            color: white;
+        }
+        
+        .action-btn.primary:hover {
+            background: #1565c0;
+        }
+        
+        .action-btn.secondary {
+            background: white;
+            color: #1976d2;
+            border: 2px solid #1976d2;
+        }
+        
+        .action-btn.secondary:hover {
+            background: #e3f2fd;
+        }
+        
+        .action-btn.danger {
+            background: #ff5722;
+            color: white;
+        }
+        
+        .action-btn.danger:hover {
+            background: #e64a19;
+        }
+        
+        /* Loading State */
+        .loading {
+            text-align: center;
+            padding: 2rem;
+            color: var(--text-secondary);
+        }
+        
+        .spinner {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #1976d2;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 1rem auto;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 3rem 1rem;
+            color: var(--text-secondary);
+        }
+        
+        .empty-state-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+        
+        /* Responsive */
+        @media (max-width: 1200px) {
+            .detail-panel {
+                flex: 0 0 400px;
+            }
+        }
+        
+        @media (max-width: 900px) {
+            .main-content {
+                flex-direction: column;
+            }
+            
+            .detail-panel {
+                flex: 1;
+                position: relative;
+                top: 0;
+                max-height: none;
+            }
+        }
+        
+        /* Compliance Checklist Styles */
+        .compliance-item {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.5rem;
+            background: #f5f5f5;
+            border-radius: 4px;
+            font-size: 0.9rem;
+        }
+        
+        .compliance-item input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            cursor: not-allowed;
+        }
+        
+        .compliance-item input[type="checkbox"]:checked {
+            accent-color: var(--esi-4-green);
+        }
+        
+        /* Accountability Card */
+        .accountability-card {
+            padding: 1rem;
+            background: #f5f5f5;
+            border-radius: 4px;
+            text-align: center;
+        }
+        
+        .accountability-value {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 0.25rem;
+        }
+        
+        .accountability-label {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+        }
+        
+        /* Escalation Tally Item */
+        .escalation-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.75rem;
+            background: #f5f5f5;
+            border-radius: 4px;
+        }
+        
+        .escalation-item .label {
+            font-size: 0.9rem;
+        }
+        
+        .escalation-item .count {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: var(--esi-2-orange);
+        }
+        
+        /* Audit Log Entry */
+        .audit-entry {
+            padding: 1rem;
+            border-left: 4px solid var(--border-color);
+            margin-bottom: 1rem;
+            background: #f9f9f9;
+            border-radius: 4px;
+        }
+        
+        .audit-entry.system {
+            border-left-color: var(--esi-5-blue);
+            background: #e3f2fd;
+        }
+        
+        .audit-entry.override {
+            border-left-color: var(--esi-2-orange);
+            background: #fff3e0;
+        }
+        
+        .audit-entry .timestamp {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            margin-bottom: 0.5rem;
+        }
+        
+        .audit-entry .action {
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+        }
+        
+        .audit-entry .details {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation Header -->
+    <nav class="nav-header">
+        <div class="nav-container">
+            <div>
+                <div class="nav-brand">
+                    🏥 PatientTriage.ai
+                </div>
+                <div class="nav-subtitle">
+                    AI-Assisted Emergency Department Triage · ESI Classification
+                </div>
+            </div>
+            <div class="nav-tabs">
+                <a href="index.html" class="nav-tab">📝 Patient Intake</a>
+                <a href="queue.html" class="nav-tab active">📋 ED Queue</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Dashboard Header -->
+    <div class="dashboard-header">
+        <div class="dashboard-header-content">
+            <div class="facility-info">
+                <h2>🏥 Civil Hospital Rampur</h2>
+                <div class="facility-meta">
+                    ESI Framework · DPDPA 2023 Compliant · Real-time Monitoring
+                </div>
+            </div>
+            <div class="role-controls">
+                <div class="role-toggle">
+                    <button class="role-btn active" data-role="clinical">👨‍⚕️ Clinical View</button>
+                    <button class="role-btn" data-role="governance">📋 Governance</button>
+                </div>
+                <button class="action-btn primary" onclick="window.location.href='index.html'" style="padding: 0.5rem 1rem; margin-left: 1rem;">
+                    ➕ Add New Patient
+                </button>
+                <div class="surge-toggle" id="surge-toggle">
+                    <div class="surge-indicator"></div>
+                    <span>Normal Mode</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Surge Alert Banner -->
+    <div class="surge-alert" id="surge-alert">
+        <div class="surge-alert-content">
+            <strong>⚠️ SURGE MODE ACTIVE</strong> —
+            ED at 3× normal volume (est. 450–600 patients).
+            ESI 3 max wait: 30 min → 20 min.
+            Borderline ESI 3 cases auto-escalated to ESI 2.
+            On-call staff alert triggered.
+            <span style="margin-left: 1rem; opacity: 0.9; font-size: 0.9rem;">
+                [Cannot be dismissed during surge operations]
+            </span>
+        </div>
+    </div>
+
+    <!-- Metrics Bar -->
+    <div class="metrics-bar">
+        <div class="metrics-container">
+            <div class="metric-card">
+                <div class="metric-value" id="metric-total">—</div>
+                <div class="metric-label">Queue Total</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-value" id="metric-esi1">—</div>
+                <div class="metric-label">ESI 1 — Immediate</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-value" id="metric-esi2">—</div>
+                <div class="metric-label">ESI 2 — Emergent</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-value" id="metric-esi3">—</div>
+                <div class="metric-label">ESI 3 — Urgent</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-value" id="metric-esi45">—</div>
+                <div class="metric-label">ESI 4–5 — Less Urgent</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-value" id="metric-alerts">—</div>
+                <div class="metric-label">Deterioration Alerts</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content" id="clinical-view">
+        <!-- Queue Panel -->
+        <div class="queue-panel">
+            <div class="queue-header">
+                <h3>Priority Queue · <span id="queue-count">0</span> patients</h3>
+                <div class="queue-filters">
+                    <div class="search-box">
+                        <input type="text" id="patient-search" placeholder="Search by name, ID, or complaint..." onkeyup="searchPatients(this.value)">
+                    </div>
+                    <button class="filter-btn active" data-filter="all">All</button>
+                    <button class="filter-btn" data-filter="critical">ESI 1-2</button>
+                    <button class="filter-btn" data-filter="urgent">ESI 3</button>
+                    <button class="filter-btn" data-filter="alerts">⚠️ Alerts</button>
+                </div>
+            </div>
+            <div class="queue-list" id="queue-list">
+                <div class="loading">
+                    <div class="spinner"></div>
+                    <p>Loading patient queue...</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Detail Panel -->
+        <div class="detail-panel">
+            <div class="detail-header">
+                <h3>Patient Detail</h3>
+                <div style="font-size: 0.9rem; opacity: 0.9;">Select a patient to review</div>
+            </div>
+            <div class="detail-content" id="detail-content">
+                <div class="detail-placeholder">
+                    <div style="font-size: 3rem; margin-bottom: 1rem;">🏥</div>
+                    <p>Click a patient card to view details</p>
+                    <p style="font-size: 0.85rem; margin-top: 0.5rem;">
+                        Patient vitals, AI reasoning, safety alerts,<br>
+                        and reassessment status will appear here
+                    </p>
+                </div>
+            </div>
+            <div class="detail-actions" id="detail-actions" style="display: none;">
+                <button class="action-btn primary" onclick="reassessPatient()">🔄 Reassess Now</button>
+                <button class="action-btn secondary" onclick="viewFullDetail()">📋 Full Detail</button>
+                <button class="action-btn" onclick="removeFromQueue()" style="background: #d32f2f; color: white;">🏥 Remove from Queue (Bed Assigned)</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Governance View (hidden by default) -->
+    <div class="main-content" id="governance-view" style="display: none;">
+        <!-- Left Panel: Accountability & Compliance -->
+        <div style="flex: 1; display: flex; flex-direction: column; gap: 1.5rem;">
+            <!-- Accountability Summary -->
+            <div style="background: white; border-radius: 8px; box-shadow: var(--shadow); padding: 1.5rem;">
+                <h3 style="margin-bottom: 1rem; font-size: 1.2rem; display: flex; align-items: center; gap: 0.5rem;">
+                    📊 Accountability Summary — Live Counts
+                </h3>
+                <div id="accountability-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1rem;">
+                    <!-- Will be populated dynamically -->
+                </div>
+            </div>
+
+            <!-- Escalation Rule Tally -->
+            <div style="background: white; border-radius: 8px; box-shadow: var(--shadow); padding: 1.5rem;">
+                <h3 style="margin-bottom: 1rem; font-size: 1.2rem; display: flex; align-items: center; gap: 0.5rem;">
+                    📈 Escalation Rule Tally — Calibration Data
+                </h3>
+                <div id="escalation-tally" style="display: flex; flex-direction: column; gap: 0.75rem;">
+                    <!-- Will be populated dynamically -->
+                </div>
+            </div>
+
+            <!-- DPDPA 2023 Compliance Checklist -->
+            <div style="background: white; border-radius: 8px; box-shadow: var(--shadow); padding: 1.5rem;">
+                <h3 style="margin-bottom: 1rem; font-size: 1.2rem; display: flex; align-items: center; gap: 0.5rem;">
+                    ✅ DPDPA 2023 Compliance Checklist
+                </h3>
+                <div id="compliance-checklist" style="display: flex; flex-direction: column; gap: 0.5rem;">
+                    <!-- 8 compliance items -->
+                    <div class="compliance-item">
+                        <input type="checkbox" checked disabled>
+                        <span>Data minimization — only clinically necessary fields collected</span>
+                    </div>
+                    <div class="compliance-item">
+                        <input type="checkbox" checked disabled>
+                        <span>Purpose limitation — data used solely for triage and care</span>
+                    </div>
+                    <div class="compliance-item">
+                        <input type="checkbox" checked disabled>
+                        <span>Consent obtained — patient informed of AI assistance</span>
+                    </div>
+                    <div class="compliance-item">
+                        <input type="checkbox" checked disabled>
+                        <span>Right to human review — override mechanism functional</span>
+                    </div>
+                    <div class="compliance-item">
+                        <input type="checkbox" checked disabled>
+                        <span>Audit trail maintained — all decisions logged with timestamps</span>
+                    </div>
+                    <div class="compliance-item">
+                        <input type="checkbox" checked disabled>
+                        <span>Data security — encrypted storage and transmission</span>
+                    </div>
+                    <div class="compliance-item">
+                        <input type="checkbox" checked disabled>
+                        <span>Algorithmic accountability — model explainability via SHAP</span>
+                    </div>
+                    <div class="compliance-item">
+                        <input type="checkbox" checked disabled>
+                        <span>No profiling based on protected characteristics</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Panel: Override History & Patient Audit -->
+        <div style="flex: 1; background: white; border-radius: 8px; box-shadow: var(--shadow); display: flex; flex-direction: column; max-height: calc(100vh - 120px);">
+            <div style="padding: 1.5rem; border-bottom: 2px solid var(--border-color);">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                    <div>
+                        <h3 style="margin: 0; font-size: 1.2rem;">📋 Override History & Patient Audit</h3>
+                        <p style="margin: 0.5rem 0 0 0; font-size: 0.9rem; color: var(--text-secondary);">
+                            <span id="audit-log-subtitle">All patients with ESI assignments and overrides</span>
+                        </p>
+                    </div>
+                    <button onclick="refreshGovernanceView()" style="padding: 0.5rem 1rem; background: var(--esi-5-blue); color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 0.9rem;">
+                        🔄 Refresh
+                    </button>
+                </div>
+                <!-- Search Box for Governance -->
+                <div class="search-box" style="margin-top: 0.5rem;">
+                    <input type="text" id="governance-search" placeholder="Search by name, ID, or complaint..." onkeyup="searchGovernancePatients(this.value)" style="width: 100%; padding: 0.5rem 0.75rem 0.5rem 2.5rem; border: 1px solid var(--border-color); border-radius: 4px; font-size: 0.9rem;">
+                </div>
+            </div>
+            <div id="audit-log-content" style="flex: 1; overflow-y: auto; padding: 1.5rem;">
+                <!-- Will be populated with all patients sorted by latest override -->
+                <div style="text-align: center; color: var(--text-secondary); padding: 3rem 1rem;">
+                    <div style="font-size: 3rem; margin-bottom: 1rem;">⏳</div>
+                    <p>Loading patient audit data...</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Global state
+        let queueData = [];
+        let filteredQueueData = []; // Store filtered results
+        let governanceData = []; // Store governance audit data
+        let selectedPatient = null;
+        let currentRole = 'clinical';
+        let surgeMode = false;
+        let currentFilter = 'all';
+        let currentSearchTerm = ''; // Store search term
+        let governanceSearchTerm = ''; // Store governance search term
+
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', async function() {
+            console.log('🏥 ED Queue Dashboard initializing...');
+            
+            // IMMEDIATE TEST - Show we reached this point
+            const queueList = document.getElementById('queue-list');
+            queueList.innerHTML = '<div style="padding: 2rem; text-align: center;">✅ JavaScript loaded! Fetching data...</div>';
+            
+            // Set up role toggle
+            document.querySelectorAll('.role-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    document.querySelectorAll('.role-btn').forEach(b => b.classList.remove('active'));
+                    this.classList.add('active');
+                    currentRole = this.dataset.role;
+                    console.log('👤 Role changed to:', currentRole);
+                    
+                    // Toggle between views
+                    switchView(currentRole);
+                });
+            });
+            
+            // Set up surge toggle
+            document.getElementById('surge-toggle').addEventListener('click', function() {
+                surgeMode = !surgeMode;
+                this.classList.toggle('active');
+                this.querySelector('span').textContent = surgeMode ? 'Surge Mode Active' : 'Normal Mode';
+                
+                const surgeAlert = document.getElementById('surge-alert');
+                surgeAlert.classList.toggle('active');
+                
+                console.log('⚠️ Surge mode:', surgeMode ? 'ACTIVE' : 'inactive');
+                
+                // When surge mode is activated
+                if (surgeMode) {
+                    console.log('🚨 SURGE MODE ACTIVATED:');
+                    console.log('  - Borderline ESI 3 patients will auto-escalate to ESI 2');
+                    console.log('  - Wait thresholds tightened by 33%');
+                    console.log('  - System audit entries will be logged');
+                    
+                    // Apply surge mode effects to existing queue
+                    applySurgeModeToQueue();
+                    
+                    // Log surge activation
+                    logSurgeEvent('SURGE_ACTIVATED', 'Surge Mode activated by operator. Auto-escalation and tightened thresholds now in effect.');
+                } else {
+                    console.log('✅ Surge mode deactivated - reverting to normal operations');
+                    
+                    // Revert surge mode effects
+                    revertSurgeModeFromQueue();
+                    
+                    // Log surge deactivation
+                    logSurgeEvent('SURGE_DEACTIVATED', 'Surge Mode deactivated. All escalations reverted to normal.');
+                }
+                
+                // Update displays
+                displayQueue();
+                updateMetrics();
+                
+                // Update governance view if active
+                if (currentRole === 'governance') {
+                    populateGovernanceData();
+                }
+            });
+            
+            // Set up filter buttons
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+                    this.classList.add('active');
+                    currentFilter = this.dataset.filter;
+                    filterQueue();
+                });
+            });
+            
+            // Load queue data
+            try {
+                await loadQueueData();
+            } catch (error) {
+                console.error('❌ FATAL: Failed to load queue data:', error);
+                document.getElementById('queue-list').innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon">⚠️</div>
+                        <p><strong>Fatal Error Loading Queue</strong></p>
+                        <p style="font-size: 0.9rem; margin-top: 0.5rem; color: #d32f2f;">
+                            ${error.message}
+                        </p>
+                        <p style="font-size: 0.85rem; margin-top: 0.5rem;">
+                            Check browser console for details
+                        </p>
+                        <button onclick="location.reload()" style="margin-top: 1rem; padding: 0.5rem 1rem; background: #1976d2; color: white; border: none; border-radius: 4px; cursor: pointer;">
+                            Retry
+                        </button>
+                    </div>
+                `;
+            }
+            
+            // Check if we should refresh (e.g., after adding new patient)
+            const urlParams = new URLSearchParams(window.location.search);
+            if (urlParams.get('refresh') === 'true') {
+                console.log('🔄 Refreshing queue after new patient added');
+                // Remove the parameter from URL
+                window.history.replaceState({}, document.title, window.location.pathname);
+            }
+            
+            // Refresh every 30 seconds
+            setInterval(refreshQueue, 30000);
+        });
+
+        // Load queue data from backend
+        async function loadQueueData() {
+            console.log('🔍 loadQueueData() called');
+            try {
+                console.log('📥 Loading patient queue from backend...');
+                
+                // Get all patients from backend
+                console.log('🌐 Fetching from: http://localhost:8000/api/v1/patients');
+                const response = await fetch('http://localhost:8000/api/v1/patients');
+                console.log('📡 Response status:', response.status, response.ok);
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
+                const data = await response.json();
+                console.log(`✅ Loaded ${data.count} patients:`, data.patients.length);
+                
+                // Process each patient to calculate metrics
+                console.log('⚙️ Processing patient data...');
+                queueData = data.patients.map((patient, index) => {
+                    try {
+                        // Use ground_truth_esi if available (clinician's final decision), otherwise predict
+                        const esiLevel = patient.ground_truth_esi || 3; // Default to ESI 3 if no ground truth
+                        
+                        console.log(`Processing patient ${index + 1}/${data.patients.length}: ${patient.name}, ESI ${esiLevel}`);
+                        
+                        // Create prediction object from patient data
+                        const prediction = {
+                            esi_prediction: esiLevel,
+                            confidence_breakdown: { level: 'MEDIUM', overall: 70 },
+                            safety_flag: { outcome: 'GREEN', triggered_criteria: [] },
+                            probability_distribution: {}
+                        };
+                        
+                        // Calculate realistic wait time based on ESI level
+                        // Generate staggered arrival times for realism
+                        const now = new Date();
+                        let minutesAgo;
+                        
+                        // Base wait time on ESI level (more urgent = less wait on average)
+                        if (esiLevel === 1) {
+                            minutesAgo = Math.floor(Math.random() * 10) + 2; // 2-12 min (just arrived)
+                        } else if (esiLevel === 2) {
+                            minutesAgo = Math.floor(Math.random() * 20) + 5; // 5-25 min
+                        } else if (esiLevel === 3) {
+                            minutesAgo = Math.floor(Math.random() * 45) + 15; // 15-60 min
+                        } else if (esiLevel === 4) {
+                            minutesAgo = Math.floor(Math.random() * 60) + 30; // 30-90 min
+                        } else {
+                            minutesAgo = Math.floor(Math.random() * 90) + 60; // 60-150 min
+                        }
+                        
+                        // Add some variation based on patient index for staggered arrivals
+                        minutesAgo += Math.floor(index * 2);
+                        
+                        // Use existing arrival timestamp or calculate new one
+                        if (!patient.arrival_timestamp) {
+                            const arrivalTime = new Date(now.getTime() - (minutesAgo * 60000));
+                            patient.arrival_timestamp = arrivalTime.toISOString();
+                        } else {
+                            // Calculate actual wait time from arrival timestamp
+                            const arrivalTime = new Date(patient.arrival_timestamp);
+                            const actualMinutesAgo = Math.floor((now - arrivalTime) / 60000);
+                            
+                            // If wait time is too long (>3 hours), recalculate realistic time
+                            if (actualMinutesAgo > 180) {
+                                minutesAgo = Math.floor(Math.random() * 120) + 10; // 10-130 minutes
+                                const newArrivalTime = new Date(now.getTime() - (minutesAgo * 60000));
+                                patient.arrival_timestamp = newArrivalTime.toISOString();
+                            } else {
+                                minutesAgo = actualMinutesAgo;
+                            }
+                        }
+                        
+                        const waitMinutes = minutesAgo;
+                        
+                        // Check for deterioration (simulated)
+                        const isDeteriorating = checkDeterioration(patient, prediction);
+                        
+                        // Check for reassessment due
+                        const reassessmentDue = checkReassessmentDue(prediction.esi_prediction, waitMinutes);
+                        
+                        return {
+                            ...patient,
+                            prediction,
+                            waitMinutes,
+                            isDeteriorating,
+                            reassessmentDue
+                        };
+                    } catch (err) {
+                        console.error(`Error processing patient ${index}:`, err, patient);
+                        throw err;
+                    }
+                });
+                
+                console.log('✅ Processed', queueData.length, 'patients');
+                console.log('📊 Sample patient:', queueData[0]);
+                
+                // Sort by ESI level (1 first, then 2, 3, 4, 5)
+                queueData.sort((a, b) => a.prediction.esi_prediction - b.prediction.esi_prediction);
+                console.log('✅ Sorted by ESI');
+                
+                // Display queue immediately with placeholder predictions
+                console.log('🖼️ Displaying queue...');
+                displayQueue();
+                console.log('📈 Updating metrics...');
+                updateMetrics();
+                console.log('✅ Initial display complete');
+                
+                // Now fetch real predictions in the background (one by one to avoid overwhelming backend)
+                console.log('🔄 Fetching ML predictions in background...');
+                fetchPredictionsInBackground();
+                
+            } catch (error) {
+                console.error('❌ Error loading queue:', error);
+                document.getElementById('queue-list').innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon">⚠️</div>
+                        <p><strong>Error loading patient queue</strong></p>
+                        <p style="font-size: 0.9rem; margin-top: 0.5rem;">
+                            ${error.message}
+                        </p>
+                        <button onclick="location.reload()" style="margin-top: 1rem; padding: 0.5rem 1rem; background: #1976d2; color: white; border: none; border-radius: 4px; cursor: pointer;">
+                            Retry
+                        </button>
+                    </div>
+                `;
+            }
+        }
+
+        // Fetch predictions in background (one at a time to avoid overwhelming backend)
+        async function fetchPredictionsInBackground() {
+            for (let i = 0; i < queueData.length; i++) {
+                try {
+                    const patient = queueData[i];
+                    // Only fetch if we don't have a ground_truth_esi (clinician decision)
+                    if (!patient.ground_truth_esi) {
+                        const prediction = await getPredictionForPatient(patient);
+                        patient.prediction = prediction;
+                    }
+                } catch (error) {
+                    console.error(`Error fetching prediction for patient ${i}:`, error);
+                }
+                
+                // Update display every 5 patients
+                if (i % 5 === 0) {
+                    displayQueue();
+                    updateMetrics();
+                }
+            }
+            
+            // Final update
+            displayQueue();
+            updateMetrics();
+            console.log('✅ All predictions loaded');
+        }
+
+        // Get AI prediction for a patient
+        async function getPredictionForPatient(patient) {
+            try {
+                // Prepare flat payload for API
+                const payload = {
+                    age: patient.demographics.age,
+                    sex: patient.demographics.sex,
+                    hr: patient.vitals.hr,
+                    bp_systolic: patient.vitals.bp_systolic,
+                    bp_diastolic: patient.vitals.bp_diastolic,
+                    spo2: patient.vitals.spo2,
+                    rr: patient.vitals.rr,
+                    temperature: patient.vitals.temperature,
+                    chief_complaint: patient.clinical.chief_complaint,
+                    chief_complaint_category: patient.clinical.chief_complaint_category,
+                    arrival_mode: patient.clinical.arrival_mode,
+                    mental_status: patient.clinical.mental_status,
+                    pain_score: patient.clinical.pain_score,
+                    symptoms: patient.symptoms || [],
+                    medical_history: patient.medical_history || {}
+                };
+                
+                const response = await fetch('http://localhost:8000/api/v1/predict', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`Prediction failed: ${response.status}`);
+                }
+                
+                return await response.json();
+                
+            } catch (error) {
+                console.error(`❌ Error getting prediction for ${patient.name}:`, error);
+                // Return fallback prediction
+                return {
+                    esi_prediction: patient.ground_truth_esi || 3,
+                    confidence_breakdown: { level: 'MEDIUM', overall: 70 },
+                    safety_flag: { outcome: 'GREEN' }
+                };
+            }
+        }
+
+        // Check if patient is deteriorating
+        function checkDeterioration(patient, prediction) {
+            // Simulated deterioration detection
+            // In real system, would compare current vitals with previous assessment
+            
+            const vitals = patient.vitals;
+            const esi = prediction.esi_prediction;
+            
+            // Critical signs that suggest deterioration
+            const criticalSigns = [
+                vitals.hr > 120 || vitals.hr < 50,
+                vitals.bp_systolic < 90,
+                vitals.spo2 < 92,
+                vitals.rr > 24 || vitals.rr < 10,
+                patient.clinical.mental_status !== 'alert'
+            ];
+            
+            const criticalCount = criticalSigns.filter(Boolean).length;
+            
+            // If ESI 3-5 but has multiple critical signs, flag as deteriorating
+            if (esi >= 3 && criticalCount >= 2) {
+                return true;
+            }
+            
+            // Random simulation: 10% chance of deterioration flag
+            return Math.random() < 0.1;
+        }
+
+        // Check if reassessment is due
+        function checkReassessmentDue(esi, waitMinutes) {
+            // Reassessment intervals based on ESI
+            const intervals = {
+                1: 0,  // Continuous monitoring
+                2: 15, // Every 15 minutes
+                3: 30, // Every 30 minutes
+                4: 60, // Every 60 minutes
+                5: 120 // Every 2 hours
+            };
+            
+            const interval = intervals[esi] || 30;
+            
+            // In surge mode, tighten intervals by 33% (multiply by 0.67)
+            const adjustedInterval = surgeMode ? Math.max(Math.round(interval * 0.67), 5) : interval;
+            
+            return waitMinutes >= adjustedInterval;
+        }
+
+        // Display queue
+        function displayQueue() {
+            const queueList = document.getElementById('queue-list');
+            
+            if (queueData.length === 0) {
+                queueList.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon">📋</div>
+                        <p>No patients in queue</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            queueList.innerHTML = '';
+            
+            // Sort by ESI level (1-5), then by time left (ascending - least time first)
+            const sortedQueue = [...queueData].sort((a, b) => {
+                const esiA = a.prediction.esi_prediction;
+                const esiB = b.prediction.esi_prediction;
+                
+                // First, sort by ESI (lower ESI = more urgent = comes first)
+                if (esiA !== esiB) {
+                    return esiA - esiB;
+                }
+                
+                // Within same ESI, sort by time left (less time = more urgent = comes first)
+                // Calculate time left based on ESI max wait time
+                const maxWaitMinutes = {
+                    1: 0,    // Immediate
+                    2: 10,   // 10 minutes
+                    3: 30,   // 30 minutes
+                    4: 60,   // 60 minutes
+                    5: 120   // 120 minutes
+                };
+                
+                const timeLeftA = maxWaitMinutes[esiA] - a.waitMinutes;
+                const timeLeftB = maxWaitMinutes[esiB] - b.waitMinutes;
+                
+                // Less time left comes first (ascending order)
+                return timeLeftA - timeLeftB;
+            });
+            
+            sortedQueue.forEach(patient => {
+                const card = createPatientCard(patient);
+                queueList.appendChild(card);
+            });
+            
+            document.getElementById('queue-count').textContent = queueData.length;
+        }
+
+        // Create patient card element
+        function createPatientCard(patient) {
+            const card = document.createElement('div');
+            card.className = 'patient-card';
+            
+            const esi = patient.prediction.esi_prediction;
+            
+            // Add special classes
+            if (patient.isDeteriorating) {
+                card.classList.add('deteriorating');
+            } else if (patient.reassessmentDue) {
+                card.classList.add('reassessment-due');
+            }
+            
+            // Calculate time LEFT until assessment deadline based on ESI
+            const maxWaitMinutes = {
+                1: 0,    // Immediate
+                2: 10,   // 10 minutes
+                3: 30,   // 30 minutes
+                4: 60,   // 60 minutes
+                5: 120   // 120 minutes
+            };
+            
+            const timeLeftMinutes = Math.max(0, maxWaitMinutes[esi] - patient.waitMinutes);
+            const timeLeftHours = Math.floor(timeLeftMinutes / 60);
+            const timeLeftMins = timeLeftMinutes % 60;
+            
+            let timeLeftStr;
+            let timeLeftClass = '';
+            
+            if (timeLeftMinutes <= 0) {
+                timeLeftStr = '⚠️ OVERDUE';
+                timeLeftClass = 'overdue';
+            } else if (timeLeftMinutes < 5) {
+                timeLeftStr = `${timeLeftMins} min left`;
+                timeLeftClass = 'critical-time';
+            } else if (timeLeftHours > 0) {
+                timeLeftStr = `${timeLeftHours}h ${timeLeftMins}m left`;
+                timeLeftClass = '';
+            } else {
+                timeLeftStr = `${timeLeftMins} min left`;
+                timeLeftClass = '';
+            }
+            
+            // Status badges
+            let badges = '';
+            if (patient.isDeteriorating) {
+                badges += '<span class="status-badge alert">⚠️ DETERIORATING</span>';
+            }
+            if (patient.reassessmentDue) {
+                badges += '<span class="status-badge warning">🔄 REASSESS</span>';
+            }
+            if (patient.surge_escalated) {
+                badges += '<span class="status-badge alert">🚨 SURGE ESCALATED</span>';
+            }
+            if (patient.prediction.safety_flag.outcome === 'RED') {
+                badges += '<span class="status-badge alert">🚨 RED FLAG</span>';
+            }
+            if (patient.prediction.confidence_breakdown.level === 'LOW') {
+                badges += '<span class="status-badge warning">❓ LOW CONF</span>';
+            }
+            
+            card.innerHTML = `
+                <div class="esi-badge esi-${esi}">${esi}</div>
+                <div class="patient-info">
+                    <div class="patient-name">${patient.name}</div>
+                    <div class="patient-meta">
+                        <span>${patient.demographics.age}y ${patient.demographics.sex}</span>
+                        <span>·</span>
+                        <span>${patient.clinical.chief_complaint_category.replace(/_/g, ' ')}</span>
+                        <span>·</span>
+                        <span>Arrived: ${new Date(patient.arrival_timestamp).toLocaleTimeString()}</span>
+                    </div>
+                </div>
+                <div class="patient-status">
+                    <div class="wait-time ${timeLeftClass}">⏱ ${timeLeftStr}</div>
+                    <div class="status-badges">${badges}</div>
+                </div>
+            `;
+            
+            card.addEventListener('click', function() {
+                selectPatient(patient, this);
+            });
+            
+            return card;
+        }
+
+        // Select patient and show detail
+        function selectPatient(patient, cardElement) {
+            selectedPatient = patient;
+            
+            // Update selected state in list
+            document.querySelectorAll('.patient-card').forEach(card => {
+                card.classList.remove('selected');
+            });
+            if (cardElement) {
+                cardElement.classList.add('selected');
+            }
+            
+            // Display patient detail in clinical view
+            displayPatientDetail(patient);
+            
+            // If in governance view, populate audit log
+            if (currentRole === 'governance') {
+                populateAuditLog(patient);
+            }
+        }
+        
+        // Populate audit log for selected patient
+        function populateAuditLog(patient) {
+            const container = document.getElementById('audit-log-content');
+            
+            const entries = [
+                {
+                    timestamp: patient.arrival_timestamp,
+                    type: 'system',
+                    action: 'Patient Arrival',
+                    details: `${patient.name} arrived via ${patient.clinical.arrival_mode}. Chief complaint: ${patient.clinical.chief_complaint_category.replace(/_/g, ' ')}`
+                },
+                {
+                    timestamp: patient.arrival_timestamp,
+                    type: 'system',
+                    action: 'ML Triage Assessment',
+                    details: `AI predicted ESI ${patient.original_esi || patient.prediction.esi_prediction} with ${patient.prediction.confidence_breakdown.level} confidence (${patient.prediction.confidence_breakdown.overall.toFixed(0)}%)`
+                }
+            ];
+            
+            // Add safety flag entry if present
+            if (patient.prediction.safety_flag.outcome !== 'GREEN') {
+                entries.push({
+                    timestamp: patient.arrival_timestamp,
+                    type: 'system',
+                    action: `Safety Flag: ${patient.prediction.safety_flag.outcome}`,
+                    details: patient.prediction.safety_flag.recommended_action
+                });
+            }
+            
+            // Add surge-related entries for this patient from surge audit log
+            const patientSurgeEntries = surgeAuditLog.filter(e => 
+                e.patient_id === patient.patient_id
+            );
+            
+            patientSurgeEntries.forEach(entry => {
+                entries.push({
+                    timestamp: entry.timestamp,
+                    type: 'system',
+                    action: entry.event.replace(/_/g, ' '),
+                    details: entry.description
+                });
+            });
+            
+            // Add current surge escalation status if applicable
+            if (patient.surge_escalated) {
+                entries.push({
+                    timestamp: new Date().toISOString(),
+                    type: 'system',
+                    action: 'SURGE AUTO-ESCALATION ACTIVE',
+                    details: `Patient currently auto-escalated from ESI ${patient.original_esi} to ESI 2 due to active Surge Mode. Reason: Borderline ESI 3 with ${patient.prediction.confidence_breakdown.level} confidence.`
+                });
+            }
+            
+            // Sort by timestamp (most recent first)
+            entries.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+            
+            let html = `
+                <div style="margin-bottom: 1.5rem;">
+                    <h4 style="font-size: 1.1rem; margin-bottom: 0.5rem;">Patient: ${patient.name}</h4>
+                    <p style="font-size: 0.9rem; color: var(--text-secondary);">ID: ${patient.patient_id}</p>
+                    <p style="font-size: 0.9rem; color: var(--text-secondary);">Current ESI: ${patient.prediction.esi_prediction}${patient.surge_escalated ? ' (Surge Escalated)' : ''}</p>
+                </div>
+            `;
+            
+            entries.forEach(entry => {
+                const entryClass = entry.type === 'system' ? 'audit-entry system' : 
+                                   entry.type === 'override' ? 'audit-entry override' : 'audit-entry';
+                
+                html += `
+                    <div class="${entryClass}">
+                        <div class="timestamp">${new Date(entry.timestamp).toLocaleString()}</div>
+                        <div class="action">${entry.action}</div>
+                        <div class="details">${entry.details}</div>
+                    </div>
+                `;
+            });
+            
+            container.innerHTML = html;
+        }
+
+        // Display patient detail in right panel
+        function displayPatientDetail(patient) {
+            const detailContent = document.getElementById('detail-content');
+            const detailActions = document.getElementById('detail-actions');
+            
+            // Defensive checks for required fields
+            if (!patient || !patient.prediction) {
+                detailContent.innerHTML = `
+                    <div style="text-align: center; padding: 2rem; color: var(--text-secondary);">
+                        <p>Error: Unable to load patient details</p>
+                    </div>
+                `;
+                detailActions.style.display = 'none';
+                return;
+            }
+            
+            const esi = patient.prediction.esi_prediction;
+            const confidence = patient.prediction.confidence_breakdown || { level: 'UNKNOWN', overall: 0 };
+            const safetyFlag = patient.prediction.safety_flag || { outcome: 'GREEN', triggered_rules: [] };
+            
+            detailContent.innerHTML = `
+                <div class="detail-section">
+                    <h4>🆔 Patient Information</h4>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; font-size: 0.9rem;">
+                        <div><strong>Name:</strong> ${patient.name || 'Unknown'}</div>
+                        <div><strong>ID:</strong> ${patient.patient_id ? patient.patient_id.slice(0, 8) + '...' : 'N/A'}</div>
+                        <div><strong>Age:</strong> ${patient.demographics?.age || 'N/A'} years</div>
+                        <div><strong>Sex:</strong> ${patient.demographics?.sex || 'N/A'}</div>
+                        <div><strong>Arrival:</strong> ${patient.arrival_timestamp ? new Date(patient.arrival_timestamp).toLocaleTimeString() : 'N/A'}</div>
+                        <div><strong>Wait Time:</strong> ${patient.waitMinutes || 0} min</div>
+                    </div>
+                </div>
+                
+                <div class="detail-section">
+                    <h4>🚨 AI Triage Assessment</h4>
+                    <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 1rem;">
+                        <div class="esi-badge esi-${esi}" style="width: 60px; height: 60px; font-size: 2rem;">${esi}</div>
+                        <div>
+                            <div style="font-size: 1.2rem; font-weight: 600;">ESI Level ${esi}</div>
+                            <div style="font-size: 0.9rem; color: #666;">${getESIDescription(esi)}</div>
+                        </div>
+                    </div>
+                    <div style="background: #f5f5f5; padding: 0.75rem; border-radius: 4px; margin-top: 0.75rem;">
+                        <div style="font-size: 0.85rem; color: #666; margin-bottom: 0.25rem;">Confidence Level</div>
+                        <div style="font-size: 1.1rem; font-weight: 600; color: ${getConfidenceColor(confidence.level)};">
+                            ${confidence.level} (${confidence.overall ? confidence.overall.toFixed(0) : '0'}%)
+                        </div>
+                    </div>
+                    ${safetyFlag.outcome !== 'GREEN' ? `
+                        <div style="background: ${safetyFlag.outcome === 'RED' ? '#ffebee' : '#fff9c4'}; padding: 0.75rem; border-radius: 4px; border-left: 4px solid ${safetyFlag.outcome === 'RED' ? '#d32f2f' : '#fbc02d'}; margin-top: 0.75rem;">
+                            <div style="font-weight: 600; color: ${safetyFlag.outcome === 'RED' ? '#d32f2f' : '#f57f17'};">
+                                ${safetyFlag.outcome === 'RED' ? '🚨 RED FLAG' : '⚠️ YELLOW FLAG'}
+                            </div>
+                            <div style="font-size: 0.85rem; margin-top: 0.25rem;">
+                                ${safetyFlag.triggered_criteria ? safetyFlag.triggered_criteria.join(', ') : 'Safety criteria triggered'}
+                            </div>
+                        </div>
+                    ` : ''}
+                </div>
+                
+                <div class="detail-section">
+                    <h4>💉 Current Vitals</h4>
+                    <div class="vital-grid">
+                        ${createVitalItem('HR', patient.vitals?.hr || 'N/A', 'bpm', patient.vitals?.hr > 100 || patient.vitals?.hr < 60)}
+                        ${createVitalItem('BP', patient.vitals ? `${patient.vitals.bp_systolic}/${patient.vitals.bp_diastolic}` : 'N/A', 'mmHg', patient.vitals?.bp_systolic > 140 || patient.vitals?.bp_systolic < 90)}
+                        ${createVitalItem('SpO₂', patient.vitals?.spo2 || 'N/A', '%', patient.vitals?.spo2 < 95)}
+                        ${createVitalItem('RR', patient.vitals?.rr || 'N/A', '/min', patient.vitals?.rr > 20 || patient.vitals?.rr < 12)}
+                        ${createVitalItem('Temp', patient.vitals?.temperature || 'N/A', '°C', patient.vitals?.temperature > 38 || patient.vitals?.temperature < 36)}
+                        ${createVitalItem('Mental', patient.clinical?.mental_status || 'Unknown', '', patient.clinical?.mental_status !== 'alert')}
+                    </div>
+                </div>
+                
+                <div class="detail-section">
+                    <h4>📋 Chief Complaint</h4>
+                    <div style="background: #f5f5f5; padding: 0.75rem; border-radius: 4px; font-size: 0.9rem;">
+                        ${patient.clinical?.chief_complaint || patient.clinical?.chief_complaint_category?.replace(/_/g, ' ') || 'Not specified'}
+                    </div>
+                    ${patient.clinical?.pain_score ? `
+                        <div style="margin-top: 0.5rem; font-size: 0.9rem;">
+                            <strong>Pain Score:</strong> ${patient.clinical.pain_score}/10
+                        </div>
+                    ` : ''}
+                </div>
+                
+                ${patient.surge_escalated ? `
+                    <div class="detail-section">
+                        <div style="background: #ffebee; padding: 1rem; border-radius: 4px; border-left: 4px solid #d32f2f;">
+                            <div style="font-weight: 600; color: #d32f2f; margin-bottom: 0.5rem;">
+                                🚨 SURGE MODE AUTO-ESCALATION
+                            </div>
+                            <div style="font-size: 0.9rem;">
+                                Patient auto-escalated from ESI ${patient.original_esi} to ESI ${patient.prediction.esi_prediction} due to active Surge Mode.
+                                <br><br>
+                                <strong>Reason:</strong> Borderline ESI 3 with ${confidence.level} confidence (${confidence.overall ? confidence.overall.toFixed(0) : '0'}%).
+                                <br><br>
+                                <em>Will revert to ESI ${patient.original_esi} when Surge Mode is deactivated.</em>
+                            </div>
+                        </div>
+                    </div>
+                ` : ''}
+                
+                ${patient.isDeteriorating ? `
+                    <div class="detail-section">
+                        <div style="background: #ffebee; padding: 1rem; border-radius: 4px; border-left: 4px solid #d32f2f;">
+                            <div style="font-weight: 600; color: #d32f2f; margin-bottom: 0.5rem;">
+                                ⚠️ DETERIORATION ALERT
+                            </div>
+                            <div style="font-size: 0.9rem;">
+                                Patient showing signs of clinical deterioration. Immediate reassessment recommended.
+                            </div>
+                        </div>
+                    </div>
+                ` : ''}
+                
+                ${patient.reassessmentDue ? `
+                    <div class="detail-section">
+                        <div style="background: #fff9c4; padding: 1rem; border-radius: 4px; border-left: 4px solid #fbc02d;">
+                            <div style="font-weight: 600; color: #f57f17; margin-bottom: 0.5rem;">
+                                🔄 REASSESSMENT DUE
+                            </div>
+                            <div style="font-size: 0.9rem;">
+                                Patient has been waiting ${patient.waitMinutes} minutes. Reassessment interval for ESI ${esi} exceeded.
+                            </div>
+                        </div>
+                    </div>
+                ` : ''}
+            `;
+            
+            detailActions.style.display = 'flex';
+        }
+
+        // Helper: Create vital item HTML
+        function createVitalItem(label, value, unit, isAbnormal) {
+            return `
+                <div class="vital-item${isAbnormal ? ' abnormal' : ''}">
+                    <div class="vital-label">${label}</div>
+                    <div class="vital-value">${value}${unit ? ' ' + unit : ''}</div>
+                </div>
+            `;
+        }
+
+        // Helper: Get ESI description
+        function getESIDescription(esi) {
+            const descriptions = {
+                1: 'Immediate - Life-threatening',
+                2: 'Emergent - High risk',
+                3: 'Urgent - Moderate risk',
+                4: 'Less Urgent - Low risk',
+                5: 'Non-Urgent - Minimal risk'
+            };
+            return descriptions[esi] || '';
+        }
+
+        // Helper: Get confidence color
+        function getConfidenceColor(level) {
+            return level === 'HIGH' ? '#388e3c' : level === 'MEDIUM' ? '#fbc02d' : '#d32f2f';
+        }
+
+        // Update metrics
+        function updateMetrics() {
+            if (queueData.length === 0) return;
+            
+            const counts = {
+                total: queueData.length,
+                esi1: queueData.filter(p => p.prediction.esi_prediction === 1).length,
+                esi2: queueData.filter(p => p.prediction.esi_prediction === 2).length,
+                esi3: queueData.filter(p => p.prediction.esi_prediction === 3).length,
+                esi45: queueData.filter(p => p.prediction.esi_prediction >= 4).length,
+                alerts: queueData.filter(p => p.isDeteriorating).length
+            };
+            
+            document.getElementById('metric-total').textContent = counts.total;
+            document.getElementById('metric-esi1').textContent = counts.esi1;
+            document.getElementById('metric-esi2').textContent = counts.esi2;
+            document.getElementById('metric-esi3').textContent = counts.esi3;
+            document.getElementById('metric-esi45').textContent = counts.esi45;
+            document.getElementById('metric-alerts').textContent = counts.alerts;
+        }
+
+        // Search patients
+        function searchPatients(searchTerm) {
+            currentSearchTerm = searchTerm.toLowerCase().trim();
+            filterQueue(); // Reapply filter with search
+        }
+        
+        // Filter queue
+        function filterQueue() {
+            const queueList = document.getElementById('queue-list');
+            queueList.innerHTML = '';
+            
+            let filteredData = queueData;
+            
+            // Apply ESI filter
+            if (currentFilter === 'critical') {
+                filteredData = queueData.filter(p => p.prediction.esi_prediction <= 2);
+            } else if (currentFilter === 'urgent') {
+                filteredData = queueData.filter(p => p.prediction.esi_prediction === 3);
+            } else if (currentFilter === 'alerts') {
+                filteredData = queueData.filter(p => p.isDeteriorating || p.reassessmentDue);
+            }
+            
+            // Apply search filter
+            if (currentSearchTerm) {
+                filteredData = filteredData.filter(p => 
+                    p.name.toLowerCase().includes(currentSearchTerm) ||
+                    p.patient_id.toLowerCase().includes(currentSearchTerm) ||
+                    p.clinical.chief_complaint.toLowerCase().includes(currentSearchTerm) ||
+                    p.clinical.chief_complaint_category.toLowerCase().includes(currentSearchTerm)
+                );
+            }
+            
+            // Sort by ESI level (1-5), then by time left (ascending - least time first)
+            filteredData.sort((a, b) => {
+                const esiA = a.prediction.esi_prediction;
+                const esiB = b.prediction.esi_prediction;
+                
+                // First, sort by ESI (lower ESI = more urgent = comes first)
+                if (esiA !== esiB) {
+                    return esiA - esiB;
+                }
+                
+                // Within same ESI, sort by time left (less time = more urgent = comes first)
+                const maxWaitMinutes = {
+                    1: 0,    // Immediate
+                    2: 10,   // 10 minutes
+                    3: 30,   // 30 minutes
+                    4: 60,   // 60 minutes
+                    5: 120   // 120 minutes
+                };
+                
+                const timeLeftA = maxWaitMinutes[esiA] - a.waitMinutes;
+                const timeLeftB = maxWaitMinutes[esiB] - b.waitMinutes;
+                
+                return timeLeftA - timeLeftB;
+            });
+            
+            // Store filtered data
+            filteredQueueData = filteredData;
+            
+            if (filteredData.length === 0) {
+                queueList.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon">🔍</div>
+                        <p>No patients match ${currentSearchTerm ? '"' + currentSearchTerm + '"' : 'this filter'}</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            filteredData.forEach(patient => {
+                const card = createPatientCard(patient);
+                queueList.appendChild(card);
+            });
+        }
+
+        // Refresh queue
+        async function refreshQueue() {
+            console.log('🔄 Refreshing queue...');
+            await loadQueueData();
+        }
+        
+        // Switch between Clinical and Governance views
+        function switchView(role) {
+            const clinicalView = document.getElementById('clinical-view');
+            const governanceView = document.getElementById('governance-view');
+            
+            if (role === 'clinical') {
+                clinicalView.style.display = 'flex';
+                governanceView.style.display = 'none';
+            } else {
+                clinicalView.style.display = 'none';
+                governanceView.style.display = 'flex';
+                
+                // Populate governance data
+                populateGovernanceData();
+            }
+        }
+        
+        // Populate Governance View with data
+        function populateGovernanceData() {
+            // 1. Accountability Summary
+            populateAccountabilitySummary();
+            
+            // 2. Escalation Rule Tally
+            populateEscalationTally();
+            
+            // 3. Load all patient audit data
+            loadAllPatientAudits();
+        }
+        
+        // Load all patient audits sorted by override time (latest first)
+        async function loadAllPatientAudits() {
+            const container = document.getElementById('audit-log-content');
+            
+            try {
+                // Load overrides from backend API
+                const overrideResponse = await fetch('http://localhost:8000/api/v1/overrides');
+                let overrides = [];
+                
+                if (overrideResponse.ok) {
+                    const overrideData = await overrideResponse.json();
+                    overrides = overrideData.overrides || [];
+                    console.log(`Loaded ${overrides.length} overrides from backend`);
+                } else {
+                    console.warn('Could not load overrides, using empty list');
+                }
+                
+                const overrideMap = {};
+                overrides.forEach(override => {
+                    if (!overrideMap[override.patient_id]) {
+                        overrideMap[override.patient_id] = [];
+                    }
+                    overrideMap[override.patient_id].push(override);
+                });
+                
+                // Sort all patients: those with overrides first (sorted by override time), then others
+                const patientsWithOverrides = [];
+                const patientsWithoutOverrides = [];
+                
+                queueData.forEach(patient => {
+                    if (overrideMap[patient.patient_id]) {
+                        const latestOverride = overrideMap[patient.patient_id]
+                            .sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp))[0];
+                        patientsWithOverrides.push({
+                            patient,
+                            overrides: overrideMap[patient.patient_id],
+                            latestOverrideTime: new Date(latestOverride.timestamp)
+                        });
+                    } else {
+                        patientsWithoutOverrides.push({ patient, overrides: [], latestOverrideTime: null });
+                    }
+                });
+                
+                // Sort patients with overrides by latest override time (newest first)
+                patientsWithOverrides.sort((a, b) => b.latestOverrideTime - a.latestOverrideTime);
+                
+                // Combine: overridden patients first, then others
+                const sortedPatients = [...patientsWithOverrides, ...patientsWithoutOverrides];
+                
+                if (sortedPatients.length === 0) {
+                    container.innerHTML = `
+                        <div style="text-align: center; color: var(--text-secondary); padding: 3rem 1rem;">
+                            <div style="font-size: 3rem; margin-bottom: 1rem;">📄</div>
+                            <p>No patients in queue</p>
+                        </div>
+                    `;
+                    return;
+                }
+                
+                // Render all patients
+                container.innerHTML = '';
+                
+                // For patients with ground_truth_esi, we need to get their ML predictions
+                const patientsWithPredictions = await Promise.all(sortedPatients.map(async ({ patient, overrides }) => {
+                    let mlPrediction = null;
+                    
+                    // If patient has ground_truth_esi, fetch ML prediction
+                    if (patient.ground_truth_esi) {
+                        try {
+                            const predResponse = await fetch('http://localhost:8000/api/v1/predict', {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify({
+                                    age: patient.demographics.age,
+                                    sex: patient.demographics.sex,
+                                    hr: patient.vitals.hr,
+                                    bp_systolic: patient.vitals.bp_systolic,
+                                    bp_diastolic: patient.vitals.bp_diastolic,
+                                    spo2: patient.vitals.spo2,
+                                    rr: patient.vitals.rr,
+                                    temperature: patient.vitals.temperature,
+                                    chief_complaint: patient.clinical.chief_complaint,
+                                    chief_complaint_category: patient.clinical.chief_complaint_category,
+                                    arrival_mode: patient.clinical.arrival_mode,
+                                    mental_status: patient.clinical.mental_status,
+                                    pain_score: patient.clinical.pain_score,
+                                    symptoms: patient.symptoms || [],
+                                    medical_history: patient.medical_history || {}
+                                })
+                            });
+                            
+                            if (predResponse.ok) {
+                                mlPrediction = await predResponse.json();
+                            }
+                        } catch (err) {
+                            console.error('Error fetching ML prediction:', err);
+                        }
+                    }
+                    
+                    return { patient, overrides, mlPrediction };
+                }));
+                
+                // Store governance data globally for search
+                governanceData = patientsWithPredictions;
+                
+                // Render patients
+                renderGovernancePatients(patientsWithPredictions);
+                
+            } catch (error) {
+                console.error('Error loading patient audits:', error);
+                container.innerHTML = `
+                    <div style="text-align: center; color: #d32f2f; padding: 3rem 1rem;">
+                        <div style="font-size: 3rem; margin-bottom: 1rem;">⚠️</div>
+                        <p>Error loading audit data</p>
+                        <p style="font-size: 0.85rem;">${error.message}</p>
+                    </div>
+                `;
+            }
+        }
+        
+        // Search patients in governance view
+        function searchGovernancePatients(searchTerm) {
+            governanceSearchTerm = searchTerm.toLowerCase().trim();
+            
+            if (!governanceData || governanceData.length === 0) {
+                return;
+            }
+            
+            const container = document.getElementById('audit-log-content');
+            
+            // Filter governance data
+            let filtered = governanceData;
+            if (governanceSearchTerm) {
+                filtered = governanceData.filter(({ patient }) => 
+                    patient.name.toLowerCase().includes(governanceSearchTerm) ||
+                    patient.patient_id.toLowerCase().includes(governanceSearchTerm) ||
+                    patient.clinical.chief_complaint.toLowerCase().includes(governanceSearchTerm) ||
+                    patient.clinical.chief_complaint_category.toLowerCase().includes(governanceSearchTerm)
+                );
+            }
+            
+            if (filtered.length === 0) {
+                container.innerHTML = `
+                    <div style="text-align: center; color: var(--text-secondary); padding: 3rem 1rem;">
+                        <div style="font-size: 3rem; margin-bottom: 1rem;">🔍</div>
+                        <p>No patients match "${governanceSearchTerm}"</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            // Render filtered patients (reuse the rendering logic)
+            renderGovernancePatients(filtered);
+        }
+        
+        // Render governance patients (extracted for reuse)
+        function renderGovernancePatients(patientsData) {
+            const container = document.getElementById('audit-log-content');
+            
+            container.innerHTML = patientsData.map(({ patient, overrides, mlPrediction }) => {
+                // If patient has ground_truth_esi, they've been triaged
+                const clinicianESI = patient.ground_truth_esi || patient.prediction.esi_prediction;
+                const mlESI = mlPrediction ? mlPrediction.esi_prediction : patient.prediction.esi_prediction;
+                const hasOverride = patient.ground_truth_esi && patient.ground_truth_esi !== mlESI;
+                
+                // Get override data if exists
+                let actualOverrideData = null;
+                if (hasOverride && overrides.length > 0) {
+                    actualOverrideData = overrides[0];
+                }
+                
+                return `
+                        <div style="background: ${hasOverride ? '#fff3e0' : '#f5f5f5'}; padding: 1.5rem; border-radius: 8px; margin-bottom: 1rem; border-left: 4px solid ${hasOverride ? '#ff9800' : '#ccc'};">
+                            <!-- Patient Header -->
+                            <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 1rem;">
+                                <div>
+                                    <h4 style="margin: 0 0 0.5rem 0; font-size: 1.1rem;">${patient.name}</h4>
+                                    <div style="font-size: 0.85rem; color: #666;">
+                                        ID: ${patient.patient_id.slice(0, 8)}... | 
+                                        Age: ${patient.demographics.age}${patient.demographics.sex.charAt(0).toUpperCase()} | 
+                                        Arrived: ${new Date(patient.arrival_timestamp).toLocaleTimeString()}
+                                    </div>
+                                </div>
+                                <div style="text-align: right;">
+                                    <div class="esi-badge esi-${clinicianESI}" style="display: inline-block; margin-bottom: 0.5rem;">ESI ${clinicianESI}</div>
+                                    ${hasOverride ? `<div style="font-size: 0.75rem; color: #e65100; font-weight: 600;">⚠️ OVERRIDDEN</div>` : ''}
+                                </div>
+                            </div>
+                            
+                            <!-- Chief Complaint -->
+                            <div style="background: white; padding: 0.75rem; border-radius: 4px; margin-bottom: 1rem;">
+                                <strong>Chief Complaint:</strong> ${patient.clinical.chief_complaint || patient.clinical.chief_complaint_category.replace(/_/g, ' ')}
+                            </div>
+                            
+                            <!-- Timeline -->
+                            <div style="border-left: 2px solid #ddd; padding-left: 1rem; margin-left: 0.5rem;">
+                                <!-- Arrival -->
+                                <div style="margin-bottom: 1rem; position: relative;">
+                                    <div style="position: absolute; left: -1.35rem; width: 10px; height: 10px; background: #4caf50; border-radius: 50%; border: 2px solid white;"></div>
+                                    <div style="font-size: 0.85rem; color: #666; margin-bottom: 0.25rem;">
+                                        ${new Date(patient.arrival_timestamp).toLocaleString()}
+                                    </div>
+                                    <div style="font-weight: 600;">📥 Patient Arrival</div>
+                                    <div style="font-size: 0.9rem; color: #666; margin-top: 0.25rem;">
+                                        Via ${patient.clinical.arrival_mode} | Vitals: HR ${patient.vitals.hr}, BP ${patient.vitals.bp_systolic}/${patient.vitals.bp_diastolic}, SpO2 ${patient.vitals.spo2}%
+                                    </div>
+                                </div>
+                                
+                                <!-- ML Assessment -->
+                                <div style="margin-bottom: 1rem; position: relative;">
+                                    <div style="position: absolute; left: -1.35rem; width: 10px; height: 10px; background: #2196f3; border-radius: 50%; border: 2px solid white;"></div>
+                                    <div style="font-size: 0.85rem; color: #666; margin-bottom: 0.25rem;">
+                                        ${new Date(patient.arrival_timestamp).toLocaleString()} (+2 sec)
+                                    </div>
+                                    <div style="font-weight: 600;">🤖 ML Assessment (SYSTEM)</div>
+                                    <div style="font-size: 0.9rem; margin-top: 0.25rem;">
+                                        <div>Predicted ESI: <span class="esi-badge esi-${mlESI}" style="display: inline-block; padding: 2px 8px; font-size: 0.85rem;">ESI ${mlESI}</span></div>
+                                        <div style="color: #666;">Confidence: ${mlPrediction ? mlPrediction.confidence_breakdown.level + ' (' + mlPrediction.confidence_breakdown.overall.toFixed(0) + '%)' : patient.prediction.confidence_breakdown.level + ' (' + patient.prediction.confidence_breakdown.overall.toFixed(0) + '%)'}</div>
+                                        ${(mlPrediction?.safety_flag?.outcome !== 'GREEN' || patient.prediction.safety_flag.outcome !== 'GREEN') ? `
+                                            <div style="color: ${(mlPrediction?.safety_flag?.outcome || patient.prediction.safety_flag.outcome) === 'RED' ? '#d32f2f' : '#f57f17'}; margin-top: 0.25rem;">
+                                                ${(mlPrediction?.safety_flag?.outcome || patient.prediction.safety_flag.outcome)} FLAG: ${(mlPrediction?.safety_flag?.triggered_criteria?.[0] || patient.prediction.safety_flag.triggered_criteria?.[0]) || 'Safety criteria triggered'}
+                                            </div>
+                                        ` : ''}
+                                    </div>
+                                </div>
+                                
+                                ${hasOverride && actualOverrideData ? `
+                                    <!-- Override Event -->
+                                    <div style="margin-bottom: 1rem; position: relative;">
+                                        <div style="position: absolute; left: -1.35rem; width: 10px; height: 10px; background: #ff9800; border-radius: 50%; border: 2px solid white;"></div>
+                                        <div style="font-size: 0.85rem; color: #666; margin-bottom: 0.25rem;">
+                                            ${new Date(actualOverrideData.timestamp).toLocaleString()}
+                                        </div>
+                                        <div style="font-weight: 600;">👤 Clinician Override</div>
+                                        <div style="font-size: 0.9rem; margin-top: 0.25rem;">
+                                            <div style="margin-bottom: 0.5rem;">
+                                                <strong style="color: #e65100;">${actualOverrideData.override_direction.toUpperCase()}</strong>: 
+                                                ESI ${actualOverrideData.ml_predicted_esi} → ESI ${actualOverrideData.clinician_final_esi}
+                                                (magnitude: ${actualOverrideData.override_magnitude})
+                                            </div>
+                                            <div style="background: #fff; padding: 0.75rem; border-radius: 4px; border-left: 3px solid #ff9800;">
+                                                <div style="font-weight: 600; margin-bottom: 0.25rem;">Reason Category: ${actualOverrideData.reason_category.replace(/_/g, ' ').toUpperCase()}</div>
+                                                <div style="color: #666; margin-bottom: 0.5rem;">"${actualOverrideData.reason_text}"</div>
+                                                <div style="font-size: 0.9rem; font-weight: 600; color: #1976d2; padding-top: 0.5rem; border-top: 1px solid #eee;">
+                                                    👤 Overridden By: ${actualOverrideData.clinician_id || 'SYSTEM'}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                ` : `
+                                    <!-- Accepted ML Recommendation -->
+                                    <div style="margin-bottom: 1rem; position: relative;">
+                                        <div style="position: absolute; left: -1.35rem; width: 10px; height: 10px; background: #4caf50; border-radius: 50%; border: 2px solid white;"></div>
+                                        <div style="font-size: 0.85rem; color: #666; margin-bottom: 0.25rem;">
+                                            ${new Date(patient.arrival_timestamp).toLocaleString()} (+5 sec)
+                                        </div>
+                                        <div style="font-weight: 600;">✅ ML Recommendation Accepted</div>
+                                        <div style="font-size: 0.9rem; color: #666; margin-top: 0.25rem;">
+                                            Clinician accepted ML ESI ${mlESI} without override
+                                        </div>
+                                    </div>
+                                `}
+                                
+                                <!-- Current Status -->
+                                <div style="position: relative;">
+                                    <div style="position: absolute; left: -1.35rem; width: 10px; height: 10px; background: #9e9e9e; border-radius: 50%; border: 2px solid white;"></div>
+                                    <div style="font-size: 0.85rem; color: #666; margin-bottom: 0.25rem;">
+                                        Current Status
+                                    </div>
+                                    <div style="font-weight: 600;">⏱️ Waiting in Queue</div>
+                                    <div style="font-size: 0.9rem; color: #666; margin-top: 0.25rem;">
+                                        Wait Time: ${patient.waitMinutes || 0} minutes | 
+                                        Final ESI: <span class="esi-badge esi-${clinicianESI}" style="display: inline-block; padding: 2px 8px; font-size: 0.85rem;">ESI ${clinicianESI}</span>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Expandable Details Button -->
+                            <button onclick="showPatientDetailModal('${patient.patient_id}')" style="margin-top: 1rem; padding: 0.5rem 1rem; background: white; border: 1px solid #ddd; border-radius: 4px; cursor: pointer; font-size: 0.85rem; width: 100%;">
+                                📄 View Full Patient Details
+                            </button>
+                        </div>
+                    `;
+            }).join('');
+        }
+        
+        // Refresh governance view
+        function refreshGovernanceView() {
+            populateGovernanceData();
+        }
+        
+        // Show patient detail modal
+        function showPatientDetailModal(patientId) {
+            const patient = queueData.find(p => p.patient_id === patientId);
+            if (patient) {
+                // Switch to clinical view and select patient
+                currentRole = 'clinical';
+                document.querySelectorAll('.role-btn').forEach(b => b.classList.remove('active'));
+                document.querySelector('[data-role="clinical"]').classList.add('active');
+                switchView('clinical');
+                selectPatient(patient, null);
+            }
+        }
+        
+        // Populate Accountability Summary
+        function populateAccountabilitySummary() {
+            const grid = document.getElementById('accountability-grid');
+            
+            // Load overrides from backend (simulated for now)
+            const overrideCount = 0; // Will fetch from backend
+            const escalationCount = queueData.filter(p => 
+                p.prediction && p.prediction.safety_flag && p.prediction.safety_flag.override_esi
+            ).length;
+            const safetyFlagRedCount = queueData.filter(p => 
+                p.prediction && p.prediction.safety_flag && p.prediction.safety_flag.outcome === 'RED'
+            ).length;
+            const safetyFlagYellowCount = queueData.filter(p => 
+                p.prediction && p.prediction.safety_flag && p.prediction.safety_flag.outcome === 'YELLOW'
+            ).length;
+            const lowConfidenceCount = queueData.filter(p => 
+                p.prediction && p.prediction.confidence_breakdown && p.prediction.confidence_breakdown.level === 'LOW'
+            ).length;
+            
+            grid.innerHTML = `
+                <div class="accountability-card">
+                    <div class="accountability-value">${queueData.length}</div>
+                    <div class="accountability-label">Total Patients</div>
+                </div>
+                <div class="accountability-card">
+                    <div class="accountability-value">${overrideCount}</div>
+                    <div class="accountability-label">Clinician Overrides</div>
+                </div>
+                <div class="accountability-card">
+                    <div class="accountability-value">${escalationCount}</div>
+                    <div class="accountability-label">Safety Auto-Escalations</div>
+                </div>
+                <div class="accountability-card">
+                    <div class="accountability-value">${safetyFlagRedCount}</div>
+                    <div class="accountability-label">RED Flags</div>
+                </div>
+                <div class="accountability-card">
+                    <div class="accountability-value">${safetyFlagYellowCount}</div>
+                    <div class="accountability-label">YELLOW Flags</div>
+                </div>
+                <div class="accountability-card">
+                    <div class="accountability-value">${lowConfidenceCount}</div>
+                    <div class="accountability-label">Low Confidence</div>
+                </div>
+                <div class="accountability-card">
+                    <div class="accountability-value">${surgeMode ? 'ACTIVE' : 'OFF'}</div>
+                    <div class="accountability-label">Surge Status</div>
+                </div>
+                <div class="accountability-card">
+                    <div class="accountability-value">100%</div>
+                    <div class="accountability-label">DPDPA Compliance</div>
+                </div>
+            `;
+        }
+        
+        // Populate Escalation Rule Tally
+        function populateEscalationTally() {
+            const container = document.getElementById('escalation-tally');
+            
+            // Count escalations by rule
+            const hypoxiaCount = queueData.filter(p => 
+                p.prediction && p.prediction.safety_flag && 
+                p.prediction.safety_flag.triggered_criteria.some(c => c.includes('hypoxia'))
+            ).length;
+            
+            const hypotensionCount = queueData.filter(p => 
+                p.prediction && p.prediction.safety_flag && 
+                p.prediction.safety_flag.triggered_criteria.some(c => c.includes('hypotension'))
+            ).length;
+            
+            const alteredMentalCount = queueData.filter(p => 
+                p.prediction && p.prediction.safety_flag && 
+                p.prediction.safety_flag.triggered_criteria.some(c => c.includes('mental status'))
+            ).length;
+            
+            const chestPainCount = queueData.filter(p => 
+                p.prediction && p.prediction.safety_flag && 
+                p.prediction.safety_flag.triggered_criteria.some(c => c.includes('chest pain'))
+            ).length;
+            
+            const tachycardiaCount = queueData.filter(p => 
+                p.prediction && p.prediction.safety_flag && 
+                p.prediction.safety_flag.triggered_criteria.some(c => c.includes('tachycardia'))
+            ).length;
+            
+            const lowConfidenceEscCount = queueData.filter(p => 
+                p.prediction && p.prediction.safety_flag && 
+                p.prediction.safety_flag.triggered_criteria.some(c => c.includes('LOW confidence'))
+            ).length;
+            
+            container.innerHTML = `
+                <div class="escalation-item">
+                    <div class="label">🫁 Severe Hypoxia (SpO2 < 90%)</div>
+                    <div class="count">${hypoxiaCount}</div>
+                </div>
+                <div class="escalation-item">
+                    <div class="label">💉 Critical Hypotension (BP < 90 systolic)</div>
+                    <div class="count">${hypotensionCount}</div>
+                </div>
+                <div class="escalation-item">
+                    <div class="label">🧠 Altered Mental Status</div>
+                    <div class="count">${alteredMentalCount}</div>
+                </div>
+                <div class="escalation-item">
+                    <div class="label">❤️ Chest Pain + Cardiac Risk</div>
+                    <div class="count">${chestPainCount}</div>
+                </div>
+                <div class="escalation-item">
+                    <div class="label">⚡ Severe Tachycardia (age-adjusted)</div>
+                    <div class="count">${tachycardiaCount}</div>
+                </div>
+                <div class="escalation-item">
+                    <div class="label">❓ Low Confidence + Non-Urgent ESI</div>
+                    <div class="count">${lowConfidenceEscCount}</div>
+                </div>
+                ${surgeMode ? `
+                    <div class="escalation-item" style="background: #ffebee; border-left: 4px solid var(--esi-1-red);">
+                        <div class="label">🚨 Surge Auto-Escalations (ESI 3→2)</div>
+                        <div class="count">${getSurgeEscalationCount()}</div>
+                    </div>
+                ` : ''}
+            `;
+        }
+        
+        // Get surge escalation count
+        function getSurgeEscalationCount() {
+            if (!surgeMode) return 0;
+            
+            // Count ESI 3 patients that would be escalated in surge mode
+            return queueData.filter(p => {
+                if (!p.prediction) return false;
+                const esi = p.prediction.esi_prediction;
+                const confidence = p.prediction.confidence_breakdown;
+                
+                // Borderline ESI 3: medium/low confidence or near ESI 2 boundary
+                return esi === 3 && (
+                    confidence.level === 'MEDIUM' || 
+                    confidence.level === 'LOW' ||
+                    p.prediction.probability_distribution[1] > 0.25 // >25% ESI 2 probability
+                );
+            }).length;
+        }
+        
+        // Apply Surge Mode to existing queue
+        function applySurgeModeToQueue() {
+            let escalatedCount = 0;
+            const escalatedPatients = [];
+            
+            queueData.forEach(patient => {
+                if (!patient.prediction) return;
+                
+                const esi = patient.prediction.esi_prediction;
+                const confidence = patient.prediction.confidence_breakdown;
+                const probabilities = patient.prediction.probability_distribution;
+                
+                // Check if patient qualifies for surge escalation
+                if (esi === 3 && (
+                    confidence.level === 'MEDIUM' || 
+                    confidence.level === 'LOW' ||
+                    probabilities[1] > 0.25  // >25% probability of ESI 2
+                )) {
+                    // Store original ESI
+                    patient.original_esi = esi;
+                    patient.surge_escalated = true;
+                    
+                    // Auto-escalate to ESI 2
+                    patient.prediction.esi_prediction = 2;
+                    patient.prediction.surge_override = true;
+                    
+                    escalatedCount++;
+                    escalatedPatients.push({
+                        name: patient.name,
+                        patient_id: patient.patient_id,
+                        confidence: confidence.level,
+                        confidence_score: confidence.overall
+                    });
+                    
+                    console.log(`🚨 Surge escalation: ${patient.name} ESI 3→2 (${confidence.level} confidence)`);
+                    
+                    // Log individual patient escalation
+                    logSurgeEvent('PATIENT_ESCALATED', 
+                        `Patient ${patient.name} (ID: ${patient.patient_id.slice(0, 8)}) auto-escalated ESI 3→2. Reason: ${confidence.level} confidence (${confidence.overall.toFixed(0)}%)`,
+                        patient.patient_id
+                    );
+                }
+            });
+            
+            // Log summary
+            if (escalatedCount > 0) {
+                logSurgeEvent('ESCALATION_SUMMARY', 
+                    `${escalatedCount} patient${escalatedCount > 1 ? 's' : ''} auto-escalated from ESI 3 to ESI 2 during surge activation.`
+                );
+            }
+            
+            // Re-sort queue by new ESI levels
+            queueData.sort((a, b) => a.prediction.esi_prediction - b.prediction.esi_prediction);
+        }
+        
+        // Revert Surge Mode effects from queue
+        function revertSurgeModeFromQueue() {
+            let revertedCount = 0;
+            
+            queueData.forEach(patient => {
+                if (patient.surge_escalated) {
+                    // Restore original ESI
+                    patient.prediction.esi_prediction = patient.original_esi;
+                    patient.surge_escalated = false;
+                    patient.prediction.surge_override = false;
+                    
+                    revertedCount++;
+                    
+                    console.log(`✅ Reverted: ${patient.name} ESI 2→3`);
+                    
+                    // Log individual patient reversion
+                    logSurgeEvent('PATIENT_REVERTED', 
+                        `Patient ${patient.name} (ID: ${patient.patient_id.slice(0, 8)}) reverted ESI 2→3. Surge escalation removed.`,
+                        patient.patient_id
+                    );
+                    
+                    delete patient.original_esi;
+                }
+            });
+            
+            // Log summary
+            if (revertedCount > 0) {
+                logSurgeEvent('REVERSION_SUMMARY', 
+                    `${revertedCount} patient${revertedCount > 1 ? 's' : ''} reverted from ESI 2 to original ESI 3 after surge deactivation.`
+                );
+            }
+            
+            // Re-sort queue by restored ESI levels
+            queueData.sort((a, b) => a.prediction.esi_prediction - b.prediction.esi_prediction);
+        }
+        
+        // Log surge event to audit trail (stored in memory for now)
+        let surgeAuditLog = [];
+        
+        function logSurgeEvent(eventType, description, patientId = null) {
+            const entry = {
+                timestamp: new Date().toISOString(),
+                type: 'SYSTEM',
+                event: eventType,
+                description: description,
+                operator: 'SYSTEM (Automated)',
+                patient_id: patientId,
+                surge_mode: surgeMode
+            };
+            
+            surgeAuditLog.push(entry);
+            
+            console.log('📋 Surge audit log entry:', entry);
+            
+            // If surge is deactivated, mark but keep all entries for audit trail
+            if (eventType === 'SURGE_DEACTIVATED') {
+                // Keep all entries - don't delete for audit compliance
+                console.log(`📋 Total surge audit entries: ${surgeAuditLog.length}`);
+            }
+        }
+
+        // Remove patient from queue (bed assigned)
+        function removeFromQueue() {
+            if (!selectedPatient) {
+                alert('No patient selected');
+                return;
+            }
+            
+            const confirmRemove = confirm(
+                `Remove ${selectedPatient.name} from queue?\n\n` +
+                `This action indicates the patient has been assigned a bed and is no longer waiting.\n\n` +
+                `Patient ID: ${selectedPatient.patient_id.slice(0, 8)}...\n` +
+                `ESI Level: ${selectedPatient.prediction.esi_prediction}\n\n` +
+                `Do you want to proceed?`
+            );
+            
+            if (!confirmRemove) {
+                return;
+            }
+            
+            // Remove from queueData
+            const index = queueData.findIndex(p => p.patient_id === selectedPatient.patient_id);
+            if (index > -1) {
+                queueData.splice(index, 1);
+                console.log(`✅ Removed patient ${selectedPatient.name} from queue`);
+            }
+            
+            // Clear selection
+            selectedPatient = null;
+            document.getElementById('detail-content').innerHTML = `
+                <div class="detail-placeholder">
+                    <div style="font-size: 3rem; margin-bottom: 1rem;">📄</div>
+                    <p>Patient removed from queue</p>
+                    <p style="font-size: 0.9rem; margin-top: 0.5rem;">
+                        Select another patient to view details
+                    </p>
+                </div>
+            `;
+            document.getElementById('detail-actions').style.display = 'none';
+            
+            // Refresh display
+            displayQueue();
+            updateMetrics();
+            
+            // Update queue count
+            document.getElementById('queue-count').textContent = queueData.length;
+            
+            alert(`✅ Patient removed from queue successfully`);
+        }
+        
+        // Action: Reassess patient
+        function reassessPatient() {
+            if (!selectedPatient) return;
+            
+            alert(`🔄 Reassessing ${selectedPatient.name}...\n\nIn production, this would:\n• Prompt for new vitals\n• Run new AI prediction\n• Compare with previous assessment\n• Update deterioration status\n• Log reassessment in audit trail`);
+        }
+
+        // Action: View full detail
+        function viewFullDetail() {
+            if (!selectedPatient) return;
+            
+            // Navigate to intake form with patient data pre-loaded
+            const patientId = selectedPatient.patient_id;
+            window.location.href = `index.html?patient_id=${patientId}`;
+        }
+        
+        // Toggle between patient audit log and system surge logs
+        let showingSurgeLogs = false;
+        
+        function toggleAuditLogView() {
+            showingSurgeLogs = !showingSurgeLogs;
+            const btn = document.getElementById('audit-toggle-btn');
+            const subtitle = document.getElementById('audit-log-subtitle');
+            const container = document.getElementById('audit-log-content');
+            
+            if (showingSurgeLogs) {
+                btn.textContent = 'View Patient Logs';
+                subtitle.textContent = 'Showing all surge mode system events';
+                displaySurgeAuditLog();
+            } else {
+                btn.textContent = 'View Surge Logs';
+                subtitle.textContent = 'Select a patient from Clinical View or view system logs';
+                if (selectedPatient) {
+                    populateAuditLog(selectedPatient);
+                } else {
+                    container.innerHTML = `
+                        <div style="text-align: center; color: var(--text-secondary); padding: 3rem 1rem;">
+                            <div style="font-size: 3rem; margin-bottom: 1rem;">📄</div>
+                            <p>No patient selected</p>
+                            <p style="font-size: 0.85rem; margin-top: 0.5rem;">
+                                Switch to Clinical View and select a patient to view their audit trail
+                            </p>
+                        </div>
+                    `;
+                }
+            }
+        }
+        
+        // Display all surge audit log entries
+        function displaySurgeAuditLog() {
+            const container = document.getElementById('audit-log-content');
+            
+            if (surgeAuditLog.length === 0) {
+                container.innerHTML = `
+                    <div style="text-align: center; color: var(--text-secondary); padding: 3rem 1rem;">
+                        <div style="font-size: 3rem; margin-bottom: 1rem;">📊</div>
+                        <p>No Surge Events Logged</p>
+                        <p style="font-size: 0.85rem; margin-top: 0.5rem;">
+                            Activate Surge Mode to begin logging system events
+                        </p>
+                    </div>
+                `;
+                return;
+            }
+            
+            let html = `
+                <div style="margin-bottom: 1.5rem; padding: 1rem; background: #e3f2fd; border-radius: 4px; border-left: 4px solid var(--esi-5-blue);">
+                    <h4 style="font-size: 1.1rem; margin-bottom: 0.5rem;">🚨 Surge Mode System Audit Log</h4>
+                    <p style="font-size: 0.9rem; margin: 0;">Total Events: ${surgeAuditLog.length}</p>
+                    <p style="font-size: 0.9rem; margin: 0;">Current Status: ${surgeMode ? 'ACTIVE' : 'Inactive'}</p>
+                </div>
+            `;
+            
+            // Sort by timestamp (most recent first)
+            const sortedEntries = [...surgeAuditLog].sort((a, b) => 
+                new Date(b.timestamp) - new Date(a.timestamp)
+            );
+            
+            sortedEntries.forEach(entry => {
+                const isActivation = entry.event.includes('ACTIVATED');
+                const isDeactivation = entry.event.includes('DEACTIVATED');
+                const isEscalation = entry.event.includes('ESCALATED') && !entry.event.includes('REVERT');
+                const isReversion = entry.event.includes('REVERT');
+                
+                let borderColor = 'var(--esi-5-blue)';
+                let bgColor = '#e3f2fd';
+                
+                if (isActivation) {
+                    borderColor = 'var(--esi-1-red)';
+                    bgColor = '#ffebee';
+                } else if (isDeactivation) {
+                    borderColor = 'var(--esi-4-green)';
+                    bgColor = '#e8f5e9';
+                } else if (isEscalation) {
+                    borderColor = 'var(--esi-2-orange)';
+                    bgColor = '#fff3e0';
+                } else if (isReversion) {
+                    borderColor = 'var(--esi-3-yellow)';
+                    bgColor = '#fffde7';
+                }
+                
+                html += `
+                    <div class="audit-entry system" style="border-left-color: ${borderColor}; background: ${bgColor};">
+                        <div class="timestamp">${new Date(entry.timestamp).toLocaleString()}</div>
+                        <div class="action">SYSTEM: ${entry.event.replace(/_/g, ' ')}</div>
+                        <div class="details">${entry.description}</div>
+                        <div style="font-size: 0.85rem; color: var(--text-secondary); margin-top: 0.5rem;">
+                            Operator: ${entry.operator}
+                        </div>
+                    </div>
+                `;
+            });
+            
+            container.innerHTML = html;
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,35 @@
+# PatientTriage.ai ML Core Engine Dependencies
+
+# API Framework
+fastapi>=0.100.0
+uvicorn[standard]>=0.23.0
+
+# Data Validation
+pydantic>=2.0.0
+
+# ML Models
+catboost>=1.2.0
+xgboost>=2.0.0
+shap>=0.42.0
+scikit-learn>=1.3.0
+
+# Data Storage
+redis>=4.6.0
+psycopg2-binary>=2.9.0
+sqlalchemy>=2.0.0
+alembic>=1.12.0  # Database migrations
+
+# Model Registry
+mlflow>=2.8.0
+
+# Monitoring
+prometheus-client>=0.17.0
+
+# Utilities
+python-dotenv>=1.0.0
+numpy>=1.24.0
+pandas>=2.0.0
+
+# Testing
+pytest>=7.4.0
+hypothesis>=6.92.0

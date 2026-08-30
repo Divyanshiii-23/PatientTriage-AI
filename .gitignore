@@ -1,0 +1,71 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Virtual Environments
+venv/
+ENV/
+env/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Data (keep structure, ignore content)
+data/patients.json
+data/overrides.json
+!data/test_patients.json
+
+# Logs
+*.log
+
+# Models (if large)
+models/*.cbm
+models/*.pkl
+
+# Hypothesis cache
+.hypothesis/
+
+# Test cache
+.pytest_cache/
+
+# Documentation build
+docs/_build/
+
+# Jupyter Notebooks (if any)
+.ipynb_checkpoints/
+
+# Environment variables
+.env
+.env.local
+
+# Coverage reports
+htmlcov/
+.coverage
+.coverage.*

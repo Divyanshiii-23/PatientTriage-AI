@@ -1,0 +1,951 @@
+[
+  {
+    "patient_id": "b1be5913-d28a-47ee-9bd2-f9f252fa9ae2",
+    "name": "Ayushi",
+    "demographics": {
+      "age": 25,
+      "sex": "female",
+      "age_group": "adult_18_64"
+    },
+    "vitals": {
+      "hr": 70,
+      "bp_systolic": 100,
+      "bp_diastolic": 70,
+      "spo2": 96,
+      "rr": 15,
+      "temperature": 37.0
+    },
+    "clinical": {
+      "chief_complaint": "Cough",
+      "chief_complaint_category": "cough",
+      "pain_score": 5,
+      "arrival_mode": "walk_in",
+      "mental_status": "alert"
+    },
+    "symptoms": [],
+    "medical_history": {},
+    "observations": [],
+    "ground_truth_esi": 5,
+    "arrival_timestamp": "2026-08-30T14:21:08.207951"
+  },
+  {
+    "patient_id": "ef62802c-222c-4234-b0a6-a7388df191ba",
+    "name": "hazel",
+    "demographics": {
+      "age": 3,
+      "sex": "female",
+      "age_group": "child_3_12"
+    },
+    "vitals": {
+      "hr": 80,
+      "bp_systolic": 100,
+      "bp_diastolic": 60,
+      "spo2": 96,
+      "rr": 25,
+      "temperature": 37.0
+    },
+    "clinical": {
+      "chief_complaint": "Fever (Pediatric)",
+      "chief_complaint_category": "fever_pediatric",
+      "pain_score": 4,
+      "arrival_mode": "walk_in",
+      "mental_status": "alert"
+    },
+    "symptoms": [],
+    "medical_history": {},
+    "observations": [],
+    "ground_truth_esi": 4,
+    "arrival_timestamp": "2026-08-30T13:26:04.044234"
+  },
+  {
+    "patient_id": "527fa1cd-b968-44ec-9ff5-d78b97dcd9fa",
+    "name": "John",
+    "demographics": {
+      "age": 25,
+      "sex": "male",
+      "age_group": "adult_18_64"
+    },
+    "vitals": {
+      "hr": 80,
+      "bp_systolic": 110,
+      "bp_diastolic": 70,
+      "spo2": 96,
+      "rr": 15,
+      "temperature": 37.0
+    },
+    "clinical": {
+      "chief_complaint": "Fever (Adult)",
+      "chief_complaint_category": "fever_adult",
+      "pain_score": 3,
+      "arrival_mode": "walk_in",
+      "mental_status": "alert"
+    },
+    "symptoms": [],
+    "medical_history": {},
+    "observations": [],
+    "ground_truth_esi": 5,
+    "arrival_timestamp": "2026-08-30T13:14:06.491475"
+  },
+  {
+    "patient_id": "0fd398da-278a-47a8-bd45-1aaf2ebca017",
+    "name": "Trisha",
+    "demographics": {
+      "age": 19,
+      "sex": "female",
+      "age_group": "adult_18_64"
+    },
+    "vitals": {
+      "hr": 70,
+      "bp_systolic": 115,
+      "bp_diastolic": 70,
+      "spo2": 96,
+      "rr": 13,
+      "temperature": 37.0
+    },
+    "clinical": {
+      "chief_complaint": "Seizure",
+      "chief_complaint_category": "seizure",
+      "pain_score": 0,
+      "arrival_mode": "walk_in",
+      "mental_status": "alert"
+    },
+    "symptoms": [],
+    "medical_history": {},
+    "observations": [],
+    "ground_truth_esi": 4,
+    "arrival_timestamp": "2026-08-30T12:27:55.166787"
+  },
+  {
+    "patient_id": "bc0d9536-d824-4e92-8ec1-321bad65ab98",
+    "name": "Shrasti",
+    "demographics": {
+      "age": 21,
+      "sex": "female",
+      "age_group": "adult_18_64"
+    },
+    "vitals": {
+      "hr": 70,
+      "bp_systolic": 110,
+      "bp_diastolic": 78,
+      "spo2": 97,
+      "rr": 15,
+      "temperature": 36.0
+    },
+    "clinical": {
+      "chief_complaint": "Joint Pain",
+      "chief_complaint_category": "joint_pain",
+      "pain_score": 5,
+      "arrival_mode": "walk_in",
+      "mental_status": "alert"
+    },
+    "symptoms": [],
+    "medical_history": {},
+    "observations": [],
+    "ground_truth_esi": null,
+    "arrival_timestamp": "2026-08-30T12:02:56.269761"
+  },
+  {
+    "patient_id": "0dedac35-e192-49fb-98f8-e0b2dda902c9",
+    "name": "Aashi",
+    "demographics": {
+      "age": 18,
+      "sex": "female",
+      "age_group": "adult_18_64"
+    },
+    "vitals": {
+      "hr": 70,
+      "bp_systolic": 110,
+      "bp_diastolic": 70,
+      "spo2": 97,
+      "rr": 15,
+      "temperature": 37.0
+    },
+    "clinical": {
+      "chief_complaint": "Rash",
+      "chief_complaint_category": "rash",
+      "pain_score": 0,
+      "arrival_mode": "walk_in",
+      "mental_status": "alert"
+    },
+    "symptoms": [],
+    "medical_history": {},
+    "observations": [],
+    "ground_truth_esi": null,
+    "arrival_timestamp": "2026-08-30T11:31:12.003254"
+  },
+  {
+    "patient_id": "e04ccb8d-14c6-4ba1-9f0d-6af5262e16e8",
+    "name": "Divyansh Gupta",
+    "demographics": {
+      "age": 21,
+      "sex": "male",
+      "age_group": "adult_18_64"
+    },
+    "vitals": {
+      "hr": 90,
+      "bp_systolic": 115,
+      "bp_diastolic": 80,
+      "spo2": 97,
+      "rr": 17,
+      "temperature": 37.0
+    },
+    "clinical": {
+      "chief_complaint": "Back Pain (Severe)",
+      "chief_complaint_category": "back_pain_severe",
+      "pain_score": 10,
+      "arrival_mode": "ambulance",
+      "mental_status": "alert"
+    },
+    "symptoms": [],
+    "medical_history": {},
+    "observations": [],
+    "ground_truth_esi": null,
+    "arrival_timestamp": "2026-08-30T10:51:23.727347"
+  },
+  {
+    "patient_id": "f9ce3298-209b-4ec8-9dcc-8b95f0a8d3fc",
+    "name": "Workflow Test Patient",
+    "demographics": {
+      "age": 42,
+      "sex": "female",
+      "age_group": "adult_18_64"
+    },
+    "vitals": {
+      "hr": 95,
+      "bp_systolic": 130,
+      "bp_diastolic": 85,
+      "spo2": 96,
+      "rr": 18,
+      "temperature": 37.2
+    },
+    "clinical": {
+      "chief_complaint": "Abdominal pain",
+      "chief_complaint_category": "abdominal_pain_moderate",
+      "pain_score": 6,
+      "arrival_mode": "walk_in",
+      "mental_status": "alert"
+    },
+    "symptoms": [
+      "pain"
+    ],
+    "medical_history": {},
+    "observations": [],
+    "ground_truth_esi": null,
+    "arrival_timestamp": "2026-08-30T10:49:37.628866"
+  },
+  {
+    "patient_id": "ebc197ee-744f-4cdd-bb92-51d182a8d8f7",
+    "name": "Test Patient",
+    "demographics": {
+      "age": 35,
+      "sex": "male",
+      "age_group": "adult_18_64"
+    },
+    "vitals": {
+      "hr": 85,
+      "bp_systolic": 120,
+      "bp_diastolic": 80,
+      "spo2": 98,
+      "rr": 16,
+      "temperature": 36.8
+    },
+    "clinical": {
+      "chief_complaint": "test complaint",
+      "chief_complaint_category": "fever_mild",
+      "pain_score": 2,
+      "arrival_mode": "walk_in",
+      "mental_status": "alert"
+    },
+    "symptoms": [],
+    "medical_history": {},
+    "observations": [],
+    "ground_truth_esi": null,
+    "arrival_timestamp": "2026-08-30T10:36:57.411046"
+  },
+  {
+    "patient_id": "d91729c4-6761-4445-bd98-d385d690077b",
+    "name": "John Smith",
+    "demographics": {
+      "age": 45,
+      "sex": "female",
+      "age_group": "adult_18_64"
+    },
+    "vitals": {
+      "hr": 124,
+      "bp_systolic": 105,
+      "bp_diastolic": 69,
+      "spo2": 91,
+      "rr": 22,
+      "temperature": 37.0
+    },
+    "clinical": {
+      "chief_complaint": "chest discomfort radiating to left arm, started 2 hours ago, improved with rest",
+      "chief_complaint_category": "chest_pain_cardiac",
+      "pain_score": 8,
+      "arrival_mode": "ambulance",
+      "mental_status": "alert"
+    },
+    "symptoms": [
+      "chest_pain",
+      "shortness_of_breath",
+      "diaphoresis",
+      "nausea"
+    ],
+    "medical_history": {},
+    "observations": [],
+    "ground_truth_esi": 2,
+    "arrival_timestamp": "2026-08-28T04:23:42.600124"
+  },
+  {
+    "patient_id": "7e20a8f3-b9e1-45a3-a374-36822a4c5464",
+    "name": "Maria Garcia",
+    "demographics": {
+      "age": 1,
+      "sex": "female",
+      "age_group": "infant_0_2"
+    },
+    "vitals": {
+      "hr": 170,
+      "bp_systolic": 69,
+      "bp_diastolic": 38,
+      "spo2": 92,
+      "rr": 60,
+      "temperature": 36.6
+    },
+    "clinical": {
+      "chief_complaint": "patient presenting with sepsis suspected",
+      "chief_complaint_category": "sepsis_suspected",
+      "pain_score": 0,
+      "arrival_mode": "ambulance",
+      "mental_status": "alert"
+    },
+    "symptoms": [
+      "general_malaise"
+    ],
+    "medical_history": {
+      "cardiac_history": true,
+      "on_medications": true
+    },
+    "observations": [],
+    "ground_truth_esi": 2,
+    "arrival_timestamp": "2026-08-28T03:14:42.600181"
+  },
+  {
+    "patient_id": "e36e5a7f-324c-4fa0-8e76-1c6375827ac4",
+    "name": "Wei Chen",
+    "demographics": {
+      "age": 8,
+      "sex": "male",
+      "age_group": "child_3_12"
+    },
+    "vitals": {
+      "hr": 92,
+      "bp_systolic": 95,
+      "bp_diastolic": 61,
+      "spo2": 100,
+      "rr": 20,
+      "temperature": 37.4
+    },
+    "clinical": {
+      "chief_complaint": "lower back pain, started after lifting heavy object",
+      "chief_complaint_category": "back_pain_mild",
+      "pain_score": 6,
+      "arrival_mode": "walk_in",
+      "mental_status": "alert"
+    },
+    "symptoms": [
+      "pain"
+    ],
+    "medical_history": {},
+    "observations": [],
+    "ground_truth_esi": 4,
+    "arrival_timestamp": "2026-08-28T02:53:42.600217"
+  },
+  {
+    "patient_id": "1ee3821a-1a0f-4e37-9d57-0eaa64cf4359",
+    "name": "Priya Sharma",
+    "demographics": {
+      "age": 78,
+      "sex": "male",
+      "age_group": "geriatric_65_plus"
+    },
+    "vitals": {
+      "hr": 130,
+      "bp_systolic": 103,
+      "bp_diastolic": 67,
+      "spo2": 93,
+      "rr": 34,
+      "temperature": 36.1
+    },
+    "clinical": {
+      "chief_complaint": "fall from standing height, hit head",
+      "chief_complaint_category": "trauma_head",
+      "pain_score": 1,
+      "arrival_mode": "ambulance",
+      "mental_status": "alert"
+    },
+    "symptoms": [
+      "shortness_of_breath",
+      "wheezing",
+      "cough",
+      "chest_tightness"
+    ],
+    "medical_history": {
+      "hypertension": true,
+      "diabetes": true,
+      "cardiac_history": true,
+      "on_medications": true,
+      "on_anticoagulation": true
+    },
+    "observations": [],
+    "ground_truth_esi": 2,
+    "arrival_timestamp": "2026-08-28T05:02:42.600255"
+  },
+  {
+    "patient_id": "f7463012-8f4a-4911-83df-dd74d9aa758b",
+    "name": "David Johnson",
+    "demographics": {
+      "age": 72,
+      "sex": "male",
+      "age_group": "geriatric_65_plus"
+    },
+    "vitals": {
+      "hr": 103,
+      "bp_systolic": 120,
+      "bp_diastolic": 70,
+      "spo2": 97,
+      "rr": 15,
+      "temperature": 37.0
+    },
+    "clinical": {
+      "chief_complaint": "patient presenting with chest pain pleuritic",
+      "chief_complaint_category": "chest_pain_pleuritic",
+      "pain_score": 7,
+      "arrival_mode": "ambulance",
+      "mental_status": "alert"
+    },
+    "symptoms": [
+      "pain"
+    ],
+    "medical_history": {
+      "hypertension": true,
+      "cardiac_history": true,
+      "asthma": true,
+      "on_medications": true
+    },
+    "observations": [],
+    "ground_truth_esi": 3,
+    "arrival_timestamp": "2026-08-28T03:44:42.600292"
+  },
+  {
+    "patient_id": "9b089915-f62d-4417-8a1f-d32370be47cf",
+    "name": "Aisha Mohamed",
+    "demographics": {
+      "age": 25,
+      "sex": "male",
+      "age_group": "adult_18_64"
+    },
+    "vitals": {
+      "hr": 107,
+      "bp_systolic": 130,
+      "bp_diastolic": 76,
+      "spo2": 99,
+      "rr": 15,
+      "temperature": 37.4
+    },
+    "clinical": {
+      "chief_complaint": "patient presenting with abdominal pain mild",
+      "chief_complaint_category": "abdominal_pain_mild",
+      "pain_score": 6,
+      "arrival_mode": "walk_in",
+      "mental_status": "alert"
+    },
+    "symptoms": [
+      "pain"
+    ],
+    "medical_history": {},
+    "observations": [],
+    "ground_truth_esi": 3,
+    "arrival_timestamp": "2026-08-28T04:12:42.600325"
+  },
+  {
+    "patient_id": "1f16be6f-ebc3-402b-9795-f693ca8bc54c",
+    "name": "Carlos Rodriguez",
+    "demographics": {
+      "age": 28,
+      "sex": "female",
+      "age_group": "adult_18_64"
+    },
+    "vitals": {
+      "hr": 101,
+      "bp_systolic": 120,
+      "bp_diastolic": 75,
+      "spo2": 95,
+      "rr": 18,
+      "temperature": 36.5
+    },
+    "clinical": {
+      "chief_complaint": "patient presenting with headache mild",
+      "chief_complaint_category": "headache_mild",
+      "pain_score": 4,
+      "arrival_mode": "walk_in",
+      "mental_status": "alert"
+    },
+    "symptoms": [
+      "general_malaise"
+    ],
+    "medical_history": {
+      "respiratory_history": true,
+      "on_medications": true
+    },
+    "observations": [],
+    "ground_truth_esi": 3,
+    "arrival_timestamp": "2026-08-28T04:49:42.600362"
+  },
+  {
+    "patient_id": "91258e86-d211-4ecd-9f40-7b46722baf61",
+    "name": "Emily Wilson",
+    "demographics": {
+      "age": 53,
+      "sex": "male",
+      "age_group": "adult_18_64"
+    },
+    "vitals": {
+      "hr": 73,
+      "bp_systolic": 123,
+      "bp_diastolic": 79,
+      "spo2": 99,
+      "rr": 19,
+      "temperature": 36.6
+    },
+    "clinical": {
+      "chief_complaint": "lower back pain, started after lifting heavy object",
+      "chief_complaint_category": "back_pain_mild",
+      "pain_score": 6,
+      "arrival_mode": "ambulance",
+      "mental_status": "alert"
+    },
+    "symptoms": [
+      "pain"
+    ],
+    "medical_history": {
+      "cardiac_history": true,
+      "kidney_disease": true,
+      "on_medications": false
+    },
+    "observations": [],
+    "ground_truth_esi": 4,
+    "arrival_timestamp": "2026-08-28T04:22:42.600397"
+  },
+  {
+    "patient_id": "18003743-3f83-4634-b6fc-f885091824b4",
+    "name": "Raj Patel",
+    "demographics": {
+      "age": 45,
+      "sex": "female",
+      "age_group": "adult_18_64"
+    },
+    "vitals": {
+      "hr": 80,
+      "bp_systolic": 125,
+      "bp_diastolic": 72,
+      "spo2": 97,
+      "rr": 12,
+      "temperature": 37.1
+    },
+    "clinical": {
+      "chief_complaint": "lower back pain, started after lifting heavy object",
+      "chief_complaint_category": "back_pain_mild",
+      "pain_score": 3,
+      "arrival_mode": "walk_in",
+      "mental_status": "alert"
+    },
+    "symptoms": [
+      "pain"
+    ],
+    "medical_history": {
+      "seizure_disorder": true,
+      "hypertension": true,
+      "on_medications": true
+    },
+    "observations": [],
+    "ground_truth_esi": 5,
+    "arrival_timestamp": "2026-08-28T03:17:42.600441"
+  },
+  {
+    "patient_id": "4cc41748-1854-4a2c-afe6-75ebb0b989ce",
+    "name": "Sarah Brown",
+    "demographics": {
+      "age": 60,
+      "sex": "female",
+      "age_group": "adult_18_64"
+    },
+    "vitals": {
+      "hr": 161,
+      "bp_systolic": 109,
+      "bp_diastolic": 57,
+      "spo2": 85,
+      "rr": 24,
+      "temperature": 36.9
+    },
+    "clinical": {
+      "chief_complaint": "patient presenting with headache severe",
+      "chief_complaint_category": "headache_severe",
+      "pain_score": 4,
+      "arrival_mode": "ambulance",
+      "mental_status": "drowsy"
+    },
+    "symptoms": [
+      "general_malaise"
+    ],
+    "medical_history": {
+      "hypertension": true,
+      "respiratory_history": true,
+      "on_medications": false
+    },
+    "observations": [],
+    "ground_truth_esi": 1,
+    "arrival_timestamp": "2026-08-28T03:42:42.600480"
+  },
+  {
+    "patient_id": "6e6fbaf0-0095-4254-877d-97ef70aed551",
+    "name": "Ahmed Ali",
+    "demographics": {
+      "age": 35,
+      "sex": "female",
+      "age_group": "adult_18_64"
+    },
+    "vitals": {
+      "hr": 147,
+      "bp_systolic": 98,
+      "bp_diastolic": 65,
+      "spo2": 90,
+      "rr": 21,
+      "temperature": 37.0
+    },
+    "clinical": {
+      "chief_complaint": "severe sharp abdominal pain, started 4 hours ago",
+      "chief_complaint_category": "abdominal_pain_severe",
+      "pain_score": 10,
+      "arrival_mode": "ambulance",
+      "mental_status": "confused"
+    },
+    "symptoms": [
+      "abdominal_pain",
+      "nausea_vomiting",
+      "fever"
+    ],
+    "medical_history": {
+      "kidney_disease": true,
+      "hypertension": true,
+      "on_medications": true
+    },
+    "observations": [],
+    "ground_truth_esi": 1,
+    "arrival_timestamp": "2026-08-28T04:04:42.600500"
+  },
+  {
+    "patient_id": "467e70bc-2919-4f44-9661-58302fb55971",
+    "name": "Linda Davis",
+    "demographics": {
+      "age": 50,
+      "sex": "male",
+      "age_group": "adult_18_64"
+    },
+    "vitals": {
+      "hr": 116,
+      "bp_systolic": 107,
+      "bp_diastolic": 56,
+      "spo2": 92,
+      "rr": 27,
+      "temperature": 37.1
+    },
+    "clinical": {
+      "chief_complaint": "patient presenting with gi bleed",
+      "chief_complaint_category": "gi_bleed",
+      "pain_score": 0,
+      "arrival_mode": "ambulance",
+      "mental_status": "alert"
+    },
+    "symptoms": [
+      "general_malaise"
+    ],
+    "medical_history": {
+      "diabetes": true,
+      "hypertension": true,
+      "on_medications": false
+    },
+    "observations": [],
+    "ground_truth_esi": 2,
+    "arrival_timestamp": "2026-08-28T02:24:42.600536"
+  },
+  {
+    "patient_id": "b8b0cf28-eae7-4d1f-8931-195cc2fd1d4d",
+    "name": "Michael Martinez",
+    "demographics": {
+      "age": 28,
+      "sex": "male",
+      "age_group": "adult_18_64"
+    },
+    "vitals": {
+      "hr": 114,
+      "bp_systolic": 96,
+      "bp_diastolic": 59,
+      "spo2": 91,
+      "rr": 25,
+      "temperature": 37.1
+    },
+    "clinical": {
+      "chief_complaint": "patient presenting with back pain severe",
+      "chief_complaint_category": "back_pain_severe",
+      "pain_score": 6,
+      "arrival_mode": "ambulance",
+      "mental_status": "confused"
+    },
+    "symptoms": [
+      "pain"
+    ],
+    "medical_history": {},
+    "observations": [],
+    "ground_truth_esi": 2,
+    "arrival_timestamp": "2026-08-28T03:07:42.600570"
+  },
+  {
+    "patient_id": "ecb35571-cadd-4133-89be-0db01b22724c",
+    "name": "Anna Kim",
+    "demographics": {
+      "age": 44,
+      "sex": "female",
+      "age_group": "adult_18_64"
+    },
+    "vitals": {
+      "hr": 95,
+      "bp_systolic": 116,
+      "bp_diastolic": 77,
+      "spo2": 98,
+      "rr": 14,
+      "temperature": 37.1
+    },
+    "clinical": {
+      "chief_complaint": "patient presenting with weakness unilateral",
+      "chief_complaint_category": "weakness_unilateral",
+      "pain_score": 1,
+      "arrival_mode": "ambulance",
+      "mental_status": "alert"
+    },
+    "symptoms": [
+      "general_malaise"
+    ],
+    "medical_history": {
+      "seizure_disorder": true,
+      "on_medications": true
+    },
+    "observations": [],
+    "ground_truth_esi": 3,
+    "arrival_timestamp": "2026-08-28T04:46:42.600605"
+  },
+  {
+    "patient_id": "82e5c9fa-67ca-4101-aebe-97d2a6baa91b",
+    "name": "James Lee",
+    "demographics": {
+      "age": 48,
+      "sex": "male",
+      "age_group": "adult_18_64"
+    },
+    "vitals": {
+      "hr": 102,
+      "bp_systolic": 122,
+      "bp_diastolic": 75,
+      "spo2": 98,
+      "rr": 19,
+      "temperature": 36.9
+    },
+    "clinical": {
+      "chief_complaint": "patient presenting with back pain severe",
+      "chief_complaint_category": "back_pain_severe",
+      "pain_score": 6,
+      "arrival_mode": "ambulance",
+      "mental_status": "alert"
+    },
+    "symptoms": [
+      "pain"
+    ],
+    "medical_history": {
+      "hypertension": true,
+      "on_medications": false
+    },
+    "observations": [],
+    "ground_truth_esi": 3,
+    "arrival_timestamp": "2026-08-28T02:34:42.600640"
+  },
+  {
+    "patient_id": "e825f23b-8136-4296-879a-ceb528ad9cd8",
+    "name": "Sofia Lopez",
+    "demographics": {
+      "age": 59,
+      "sex": "male",
+      "age_group": "adult_18_64"
+    },
+    "vitals": {
+      "hr": 94,
+      "bp_systolic": 127,
+      "bp_diastolic": 75,
+      "spo2": 97,
+      "rr": 18,
+      "temperature": 37.0
+    },
+    "clinical": {
+      "chief_complaint": "high fever for 2 days with chills and body aches",
+      "chief_complaint_category": "fever_high",
+      "pain_score": 3,
+      "arrival_mode": "walk_in",
+      "mental_status": "alert"
+    },
+    "symptoms": [
+      "fever",
+      "chills",
+      "malaise",
+      "body_aches"
+    ],
+    "medical_history": {
+      "diabetes": true,
+      "on_medications": true
+    },
+    "observations": [],
+    "ground_truth_esi": 3,
+    "arrival_timestamp": "2026-08-28T04:18:42.600674"
+  },
+  {
+    "patient_id": "7d6fc83a-06d3-4512-859f-17c5e3748bab",
+    "name": "Robert Anderson",
+    "demographics": {
+      "age": 20,
+      "sex": "male",
+      "age_group": "adult_18_64"
+    },
+    "vitals": {
+      "hr": 60,
+      "bp_systolic": 126,
+      "bp_diastolic": 81,
+      "spo2": 98,
+      "rr": 18,
+      "temperature": 37.4
+    },
+    "clinical": {
+      "chief_complaint": "patient presenting with fever mild",
+      "chief_complaint_category": "fever_mild",
+      "pain_score": 4,
+      "arrival_mode": "ambulance",
+      "mental_status": "alert"
+    },
+    "symptoms": [
+      "fever",
+      "chills"
+    ],
+    "medical_history": {
+      "liver_disease": true,
+      "cancer": true,
+      "on_medications": true
+    },
+    "observations": [],
+    "ground_truth_esi": 4,
+    "arrival_timestamp": "2026-08-28T04:57:42.600707"
+  },
+  {
+    "patient_id": "345c38ca-ef7b-4ec1-9b89-08133887469a",
+    "name": "Lisa Thomas",
+    "demographics": {
+      "age": 49,
+      "sex": "male",
+      "age_group": "adult_18_64"
+    },
+    "vitals": {
+      "hr": 67,
+      "bp_systolic": 122,
+      "bp_diastolic": 75,
+      "spo2": 96,
+      "rr": 18,
+      "temperature": 37.5
+    },
+    "clinical": {
+      "chief_complaint": "patient presenting with allergic reaction mild",
+      "chief_complaint_category": "allergic_reaction_mild",
+      "pain_score": 2,
+      "arrival_mode": "walk_in",
+      "mental_status": "alert"
+    },
+    "symptoms": [
+      "general_malaise"
+    ],
+    "medical_history": {
+      "asthma": true,
+      "immunocompromised": true,
+      "on_medications": true
+    },
+    "observations": [],
+    "ground_truth_esi": 4,
+    "arrival_timestamp": "2026-08-28T03:28:42.600740"
+  },
+  {
+    "patient_id": "ca8e697f-c56b-4ae7-9f1b-26ccb7cab03e",
+    "name": "Daniel White",
+    "demographics": {
+      "age": 31,
+      "sex": "female",
+      "age_group": "adult_18_64"
+    },
+    "vitals": {
+      "hr": 75,
+      "bp_systolic": 117,
+      "bp_diastolic": 85,
+      "spo2": 95,
+      "rr": 17,
+      "temperature": 37.1
+    },
+    "clinical": {
+      "chief_complaint": "patient presenting with allergic reaction mild",
+      "chief_complaint_category": "allergic_reaction_mild",
+      "pain_score": 1,
+      "arrival_mode": "walk_in",
+      "mental_status": "alert"
+    },
+    "symptoms": [
+      "general_malaise"
+    ],
+    "medical_history": {},
+    "observations": [],
+    "ground_truth_esi": 5,
+    "arrival_timestamp": "2026-08-28T03:10:42.600774"
+  },
+  {
+    "patient_id": "3e1acac1-d7a5-4bab-a932-d7f7bab41c27",
+    "name": "Jessica Taylor",
+    "demographics": {
+      "age": 39,
+      "sex": "female",
+      "age_group": "adult_18_64"
+    },
+    "vitals": {
+      "hr": 69,
+      "bp_systolic": 118,
+      "bp_diastolic": 77,
+      "spo2": 99,
+      "rr": 14,
+      "temperature": 36.5
+    },
+    "clinical": {
+      "chief_complaint": "patient presenting with rash",
+      "chief_complaint_category": "rash",
+      "pain_score": 3,
+      "arrival_mode": "walk_in",
+      "mental_status": "alert"
+    },
+    "symptoms": [
+      "general_malaise"
+    ],
+    "medical_history": {},
+    "observations": [],
+    "ground_truth_esi": 5,
+    "arrival_timestamp": "2026-08-28T02:36:42.600809"
+  }
+]

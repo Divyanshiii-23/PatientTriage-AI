@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Queue - Simple Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        .patient-card { border: 1px solid #ddd; padding: 15px; margin: 10px 0; border-radius: 8px; }
+        .esi-1 { background: #ffebee; border-left: 4px solid #c62828; }
+        .esi-2 { background: #fff3e0; border-left: 4px solid #ef6c00; }
+        .esi-3 { background: #fff9c4; border-left: 4px solid #f57f17; }
+        .esi-4 { background: #f1f8e9; border-left: 4px solid #558b2f; }
+        .esi-5 { background: #e3f2fd; border-left: 4px solid #1565c0; }
+        .esi-badge { display: inline-block; padding: 5px 15px; border-radius: 20px; font-weight: bold; color: white; }
+        .esi-badge.esi-1 { background: #c62828; }
+        .esi-badge.esi-2 { background: #ef6c00; }
+        .esi-badge.esi-3 { background: #f57f17; }
+        .esi-badge.esi-4 { background: #558b2f; }
+        .esi-badge.esi-5 { background: #1565c0; }
+    </style>
+</head>
+<body>
+    <h1>ED Queue Dashboard - Simple Test</h1>
+    <div id="status">Loading...</div>
+    <div id="patients"></div>
+
+    <script>
+        console.log('Script starting...');
+        
+        async function loadPatients() {
+            try {
+                console.log('Fetching patients from API...');
+                const response = await fetch('http://localhost:8000/api/v1/patients');
+                console.log('Response:', response.status, response.ok);
+                
+                if (!response.ok) {
+                    throw new Error('Failed to fetch: ' + response.status);
+                }
+                
+                const data = await response.json();
+                console.log('Data:', data);
+                
+                document.getElementById('status').textContent = `Loaded ${data.count} patients`;
+                
+                const container = document.getElementById('patients');
+                container.innerHTML = '';
+                
+                data.patients.forEach((patient, index) => {
+                    const esi = patient.ground_truth_esi || 3;
+                    
+                    const card = document.createElement('div');
+                    card.className = `patient-card esi-${esi}`;
+                    card.innerHTML = `
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <div>
+                                <h3 style="margin: 0 0 5px 0;">${patient.name}</h3>
+                                <div style="font-size: 0.9em; color: #666;">
+                                    Age: ${patient.demographics.age} | Sex: ${patient.demographics.sex}
+                                </div>
+                                <div style="font-size: 0.9em; color: #666; margin-top: 5px;">
+                                    Chief Complaint: ${patient.clinical.chief_complaint || patient.clinical.chief_complaint_category}
+                                </div>
+                            </div>
+                            <div>
+                                <span class="esi-badge esi-${esi}">ESI ${esi}</span>
+                            </div>
+                        </div>
+                    `;
+                    
+                    container.appendChild(card);
+                });
+                
+                console.log('Displayed', data.patients.length, 'patients');
+                
+            } catch (error) {
+                console.error('ERROR:', error);
+                document.getElementById('status').innerHTML = `<span style="color: red;">Error: ${error.message}</span>`;
+                document.getElementById('patients').innerHTML = `<div style="background: #ffebee; padding: 20px; border-radius: 8px;">
+                    <h3>Error Loading Patients</h3>
+                    <p>${error.message}</p>
+                    <p>Check console for details</p>
+                </div>`;
+            }
+        }
+        
+        // Load on page ready
+        document.addEventListener('DOMContentLoaded', () => {
+            console.log('DOM ready');
+            loadPatients();
+        });
+    </script>
+</body>
+</html>

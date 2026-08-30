@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Task 5.3 Visualization Test</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+</head>
+<body>
+    <h1>Task 5.3: ML Recommendation Panel Visualization Test</h1>
+    
+    <h2>Test 1: ESI Level Display</h2>
+    <div id="test-esi" style="padding: 20px; border: 1px solid #ccc; margin: 10px 0;">
+        <div id="esi-display" class="esi-display" style="text-align: center; padding: 2rem; border-radius: 8px;">
+            <h2 style="font-size: 3rem; margin-bottom: 0.5rem;">ESI Level <span id="esi-level">-</span></h2>
+            <p id="esi-description" style="font-size: 1.25rem; font-weight: 500;">-</p>
+        </div>
+    </div>
+    
+    <h2>Test 2: Probability Distribution Chart</h2>
+    <div id="test-prob" style="padding: 20px; border: 1px solid #ccc; margin: 10px 0;">
+        <div style="position: relative; height: 250px;">
+            <canvas id="probability-chart"></canvas>
+        </div>
+    </div>
+    
+    <h2>Test 3: Confidence Breakdown</h2>
+    <div id="test-confidence" style="padding: 20px; border: 1px solid #ccc; margin: 10px 0;">
+        <div id="confidence-breakdown"></div>
+    </div>
+    
+    <h2>Test 4: Safety Flag Banner</h2>
+    <div id="test-safety" style="padding: 20px; border: 1px solid #ccc; margin: 10px 0;">
+        <div class="safety-flag-banner" id="safety-flag-banner" style="padding: 1rem; border-radius: 4px; font-weight: 500;"></div>
+    </div>
+    
+    <h2>Test 5: SHAP Explanation</h2>
+    <div id="test-shap" style="padding: 20px; border: 1px solid #ccc; margin: 10px 0;">
+        <p id="shap-explanation" style="margin-bottom: 1rem;">-</p>
+        <div style="position: relative; height: 250px;">
+            <canvas id="shap-chart"></canvas>
+        </div>
+    </div>
+    
+    <style>
+        .esi-1 { background-color: #d32f2f; color: white; }
+        .esi-2 { background-color: #f57c00; color: white; }
+        .esi-3 { background-color: #fbc02d; color: #212121; }
+        .esi-4 { background-color: #388e3c; color: white; }
+        .esi-5 { background-color: #1976d2; color: white; }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.9; transform: scale(1.02); }
+        }
+        
+        .safety-flag-red {
+            background-color: #ffebee;
+            border: 2px solid #d32f2f;
+            color: #d32f2f;
+        }
+        
+        .safety-flag-yellow {
+            background-color: #fff9c4;
+            border: 2px solid #fbc02d;
+            color: #f57f17;
+        }
+        
+        .safety-flag-green {
+            background-color: #e8f5e9;
+            border: 2px solid #388e3c;
+            color: #388e3c;
+        }
+        
+        .confidence-item {
+            display: flex;
+            flex-direction: column;
+            gap: 0.25rem;
+            margin-bottom: 0.75rem;
+        }
+        
+        .confidence-item-header {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.9rem;
+        }
+        
+        .confidence-bar {
+            height: 8px;
+            background-color: #e0e0e0;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+        
+        .confidence-bar-fill {
+            height: 100%;
+            transition: width 0.3s ease;
+        }
+    </style>
+    
+    <script>
+        // Mock prediction response for testing
+        const mockPrediction = {
+            esi_prediction: 2,
+            probability_distribution: [0.05, 0.65, 0.20, 0.08, 0.02],
+            confidence_breakdown: {
+                model_certainty: 85.3,
+                data_completeness: 90.0,
+                clinical_consistency: 75.0,
+                pattern_recognition: 82.5,
+                overall: 83.2,
+                level: 'HIGH'
+            },
+            safety_flag: {
+                outcome: 'YELLOW',
+                triggered_criteria: ['CHEST_PAIN_AGE_OVER_50', 'ELEVATED_HEART_RATE'],
+                recommended_action: 'Cardiac risk assessment recommended',
+                override_esi: null
+            },
+            explanation: {
+                text: 'The model predicts ESI 2 based primarily on chest pain in a patient over 45 with elevated heart rate. The combination of cardiac symptoms and age increases urgency.',
+                top_factors: [
+                    { feature: 'chief_complaint', value: 'chest_pain_cardiac', contribution: 0.42, direction: 'increases urgency' },
+                    { feature: 'age', value: 45, contribution: 0.28, direction: 'increases urgency' },
+                    { feature: 'hr', value: 105, contribution: 0.18, direction: 'increases urgency' },
+                    { feature: 'spo2', value: 97, contribution: -0.12, direction: 'decreases urgency' },
+                    { feature: 'mental_status', value: 'alert', contribution: -0.08, direction: 'decreases urgency' }
+                ]
+            }
+        };
+        
+        let probabilityChart = null;
+        let shapChart = null;
+        
+        // Test 1: Display ESI Level
+        function displayESILevel(esiLevel) {
+            const esiDisplay = document.getElementById('esi-display');
+            const esiLevelSpan = document.getElementById('esi-level');
+            const esiDescription = document.getElementById('esi-description');
+            
+            esiLevelSpan.textContent = esiLevel;
+            
+            const descriptions = {
+                1: 'Resuscitation - Life-threatening',
+                2: 'Emergent - High risk',
+                3: 'Urgent - Moderate risk',
+                4: 'Less Urgent - Low risk',
+                5: 'Non-Urgent - Minimal risk'
+            };
+            esiDescription.textContent = descriptions[esiLevel] || '';
+            
+            esiDisplay.className = 'esi-display esi-' + esiLevel;
+            
+            if (esiLevel === 1) {
+                esiDisplay.style.animation = 'pulse 2s infinite';
+            } else {
+                esiDisplay.style.animation = 'none';
+            }
+        }
+        
+        // Test 2: Display probability distribution chart
+        function displayProbabilityChart(probabilityDistribution) {
+            const ctx = document.getElementById('probability-chart');
+            
+            if (probabilityChart) {
+                probabilityChart.destroy();
+            }
+            
+            const percentages = probabilityDistribution.map(p => (p * 100).toFixed(1));
+            
+            const esiColors = [
+                'rgba(211, 47, 47, 0.8)',
+                'rgba(245, 124, 0, 0.8)',
+                'rgba(251, 192, 45, 0.8)',
+                'rgba(56, 142, 60, 0.8)',
+                'rgba(25, 118, 210, 0.8)'
+            ];
+            
+            probabilityChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: ['ESI 1', 'ESI 2', 'ESI 3', 'ESI 4', 'ESI 5'],
+                    datasets: [{
+                        label: 'Probability (%)',
+                        data: percentages,
+                        backgroundColor: esiColors,
+                        borderColor: esiColors.map(c => c.replace('0.8', '1')),
+                        borderWidth: 2
+                    }]
+                },
+                options: {
+                    indexAxis: 'y',
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return context.parsed.x.toFixed(1) + '%';
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            beginAtZero: true,
+                            max: 100,
+                            title: { display: true, text: 'Probability (%)' },
+                            ticks: { callback: function(value) { return value + '%'; } }
+                        },
+                        y: { title: { display: true, text: 'ESI Level' } }
+                    }
+                }
+            });
+        }
+        
+        // Test 3: Display confidence breakdown
+        function displayConfidenceBreakdown(confidenceBreakdown) {
+            const container = document.getElementById('confidence-breakdown');
+            
+            const overallConfidence = confidenceBreakdown.overall;
+            const confidenceLevel = confidenceBreakdown.level;
+            
+            let confidenceIcon = '';
+            let confidenceColor = '';
+            if (confidenceLevel === 'HIGH') {
+                confidenceIcon = '✅';
+                confidenceColor = '#388e3c';
+            } else if (confidenceLevel === 'MEDIUM') {
+                confidenceIcon = '⚠️';
+                confidenceColor = '#fbc02d';
+            } else {
+                confidenceIcon = '🔴';
+                confidenceColor = '#d32f2f';
+            }
+            
+            let html = `
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; padding: 0.75rem; background-color: white; border-radius: 4px; border-left: 4px solid ${confidenceColor};">
+                    <div>
+                        <strong style="font-size: 1.1rem;">Overall Confidence: ${confidenceLevel}</strong>
+                        <span style="margin-left: 0.5rem; font-size: 1.3rem;">${confidenceIcon}</span>
+                    </div>
+                    <div style="font-size: 1.3rem; font-weight: bold; color: ${confidenceColor};">
+                        ${overallConfidence.toFixed(1)}%
+                    </div>
+                </div>
+            `;
+            
+            const dimensions = [
+                { label: 'Model Certainty', value: confidenceBreakdown.model_certainty },
+                { label: 'Data Completeness', value: confidenceBreakdown.data_completeness },
+                { label: 'Clinical Consistency', value: confidenceBreakdown.clinical_consistency },
+                { label: 'Pattern Recognition', value: confidenceBreakdown.pattern_recognition }
+            ];
+            
+            dimensions.forEach(dim => {
+                let barColor = '';
+                if (dim.value >= 80) {
+                    barColor = '#388e3c';
+                } else if (dim.value >= 60) {
+                    barColor = '#fbc02d';
+                } else {
+                    barColor = '#f57c00';
+                }
+                
+                html += `
+                    <div class="confidence-item">
+                        <div class="confidence-item-header">
+                            <span style="font-weight: 500;">${dim.label}</span>
+                            <span style="font-weight: 600; color: ${barColor};">${dim.value.toFixed(1)}%</span>
+                        </div>
+                        <div class="confidence-bar">
+                            <div class="confidence-bar-fill" style="width: ${dim.value}%; background-color: ${barColor};"></div>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            container.innerHTML = html;
+        }
+        
+        // Test 4: Display safety flag banner
+        function displaySafetyFlag(safetyFlag) {
+            const banner = document.getElementById('safety-flag-banner');
+            
+            if (safetyFlag.outcome === 'GREEN') {
+                banner.style.display = 'none';
+                return;
+            }
+            
+            banner.style.display = 'block';
+            
+            if (safetyFlag.outcome === 'RED') {
+                banner.className = 'safety-flag-banner safety-flag-red';
+                banner.innerHTML = '<div style="font-size: 1.2rem; font-weight: bold; margin-bottom: 0.5rem;">🚨 CRITICAL SAFETY ALERT</div>';
+            } else {
+                banner.className = 'safety-flag-banner safety-flag-yellow';
+                banner.innerHTML = '<div style="font-size: 1.1rem; font-weight: bold; margin-bottom: 0.5rem;">⚠️ Caution Advised</div>';
+            }
+            
+            banner.innerHTML += `<div style="margin-bottom: 0.5rem;"><strong>Recommendation:</strong> ${safetyFlag.recommended_action}</div>`;
+            
+            if (safetyFlag.triggered_criteria && safetyFlag.triggered_criteria.length > 0) {
+                banner.innerHTML += `
+                    <div>
+                        <strong>Triggered Criteria:</strong>
+                        <ul style="margin: 0.5rem 0 0 1.5rem; padding: 0;">
+                            ${safetyFlag.triggered_criteria.map(c => `<li>${c}</li>`).join('')}
+                        </ul>
+                    </div>
+                `;
+            }
+            
+            if (safetyFlag.override_esi) {
+                banner.innerHTML += `
+                    <div style="margin-top: 0.5rem; font-weight: bold; font-size: 1.1rem;">
+                        ⚠️ SAFETY OVERRIDE: Force ESI ${safetyFlag.override_esi}
+                    </div>
+                `;
+            }
+        }
+        
+        // Test 5: Display SHAP explanation
+        function displaySHAPExplanation(explanation) {
+            const explanationText = document.getElementById('shap-explanation');
+            const ctx = document.getElementById('shap-chart');
+            
+            explanationText.textContent = explanation.text;
+            
+            if (shapChart) {
+                shapChart.destroy();
+            }
+            
+            const topFactors = explanation.top_factors || [];
+            
+            if (topFactors.length === 0) {
+                ctx.parentElement.style.display = 'none';
+                return;
+            }
+            
+            ctx.parentElement.style.display = 'block';
+            
+            const labels = topFactors.map(f => {
+                const featureName = f.feature.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+                return `${featureName}: ${f.value}`;
+            });
+            
+            const contributions = topFactors.map(f => f.contribution);
+            
+            const colors = topFactors.map(f => {
+                if (f.direction === 'increases urgency') {
+                    return 'rgba(211, 47, 47, 0.7)';
+                } else if (f.direction === 'decreases urgency') {
+                    return 'rgba(56, 142, 60, 0.7)';
+                } else {
+                    return 'rgba(117, 117, 117, 0.7)';
+                }
+            });
+            
+            shapChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'SHAP Contribution',
+                        data: contributions,
+                        backgroundColor: colors,
+                        borderColor: colors.map(c => c.replace('0.7', '1')),
+                        borderWidth: 2
+                    }]
+                },
+                options: {
+                    indexAxis: 'y',
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    const factor = topFactors[context.dataIndex];
+                                    return [
+                                        `Contribution: ${context.parsed.x.toFixed(3)}`,
+                                        `Direction: ${factor.direction}`
+                                    ];
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        x: { title: { display: true, text: 'Feature Contribution (SHAP Value)' } },
+                        y: { title: { display: true, text: 'Contributing Factors' } }
+                    }
+                }
+            });
+        }
+        
+        // Run all tests
+        window.onload = function() {
+            console.log('Running Task 5.3 visualization tests...');
+            
+            // Test 1: ESI Level Display
+            displayESILevel(mockPrediction.esi_prediction);
+            console.log('✓ Test 1: ESI Level Display - PASSED');
+            
+            // Test 2: Probability Chart
+            displayProbabilityChart(mockPrediction.probability_distribution);
+            console.log('✓ Test 2: Probability Distribution Chart - PASSED');
+            
+            // Test 3: Confidence Breakdown
+            displayConfidenceBreakdown(mockPrediction.confidence_breakdown);
+            console.log('✓ Test 3: Confidence Breakdown - PASSED');
+            
+            // Test 4: Safety Flag
+            displaySafetyFlag(mockPrediction.safety_flag);
+            console.log('✓ Test 4: Safety Flag Banner - PASSED');
+            
+            // Test 5: SHAP Explanation
+            displaySHAPExplanation(mockPrediction.explanation);
+            console.log('✓ Test 5: SHAP Explanation - PASSED');
+            
+            console.log('\n✅ All Task 5.3 visualization tests PASSED!');
+        };
+    </script>
+</body>
+</html>

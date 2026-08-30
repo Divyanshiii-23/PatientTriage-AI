@@ -1,0 +1,444 @@
+{
+  "pbtResults": {},
+  "executionHistory": {
+    "1. Generate synthetic training dataset and test patients": [
+      {
+        "executionId": "2aad7d61-c96e-4a16-afd6-895643676b8b",
+        "chatSessionId": "sess_397f2a10-2054-4406-8aab-adb9311d9c8d",
+        "timestamp": 1787873656345
+      },
+      {
+        "executionId": "2aad7d61-c96e-4a16-afd6-895643676b8b",
+        "chatSessionId": "sess_397f2a10-2054-4406-8aab-adb9311d9c8d",
+        "timestamp": 1787873668595
+      },
+      {
+        "executionId": "2aad7d61-c96e-4a16-afd6-895643676b8b",
+        "chatSessionId": "sess_397f2a10-2054-4406-8aab-adb9311d9c8d",
+        "timestamp": 1787874341771
+      }
+    ],
+    "2.1 Implement preprocessing pipeline with age-specific vital deviation calculation": [
+      {
+        "executionId": "2aad7d61-c96e-4a16-afd6-895643676b8b",
+        "chatSessionId": "sess_397f2a10-2054-4406-8aab-adb9311d9c8d",
+        "timestamp": 1787873656379
+      },
+      {
+        "executionId": "2aad7d61-c96e-4a16-afd6-895643676b8b",
+        "chatSessionId": "sess_397f2a10-2054-4406-8aab-adb9311d9c8d",
+        "timestamp": 1787874355281
+      },
+      {
+        "executionId": "2aad7d61-c96e-4a16-afd6-895643676b8b",
+        "chatSessionId": "sess_397f2a10-2054-4406-8aab-adb9311d9c8d",
+        "timestamp": 1787876049173
+      }
+    ],
+    "2.2 Train CatBoost ESI classifier on synthetic data": [
+      {
+        "executionId": "2aad7d61-c96e-4a16-afd6-895643676b8b",
+        "chatSessionId": "sess_397f2a10-2054-4406-8aab-adb9311d9c8d",
+        "timestamp": 1787873656462
+      },
+      {
+        "executionId": "2aad7d61-c96e-4a16-afd6-895643676b8b",
+        "chatSessionId": "sess_397f2a10-2054-4406-8aab-adb9311d9c8d",
+        "timestamp": 1787876065573
+      },
+      {
+        "executionId": "d80ed1e6-f40e-4807-ac81-0999b55a08ec",
+        "chatSessionId": "sess_397f2a10-2054-4406-8aab-adb9311d9c8d",
+        "timestamp": 1787954870702
+      }
+    ],
+    "2.3 Implement SHAP explainer for feature contributions": [
+      {
+        "executionId": "2aad7d61-c96e-4a16-afd6-895643676b8b",
+        "chatSessionId": "sess_397f2a10-2054-4406-8aab-adb9311d9c8d",
+        "timestamp": 1787873656487
+      },
+      {
+        "executionId": "09f6f07e-6993-495f-aa59-9498dd225326",
+        "chatSessionId": "sess_397f2a10-2054-4406-8aab-adb9311d9c8d",
+        "timestamp": 1787876796778
+      },
+      {
+        "executionId": "d80ed1e6-f40e-4807-ac81-0999b55a08ec",
+        "chatSessionId": "sess_397f2a10-2054-4406-8aab-adb9311d9c8d",
+        "timestamp": 1787954830332
+      },
+      {
+        "executionId": "d80ed1e6-f40e-4807-ac81-0999b55a08ec",
+        "chatSessionId": "sess_397f2a10-2054-4406-8aab-adb9311d9c8d",
+        "timestamp": 1787954877150
+      },
+      {
+        "executionId": "08ea5d38-e77e-49c4-a512-a20567ae94cd",
+        "chatSessionId": "sess_397f2a10-2054-4406-8aab-adb9311d9c8d",
+        "timestamp": 1787994693638
+      }
+    ],
+    "2.4 Build multi-dimensional confidence scoring system": [
+      {
+        "executionId": "2aad7d61-c96e-4a16-afd6-895643676b8b",
+        "chatSessionId": "sess_397f2a10-2054-4406-8aab-adb9311d9c8d",
+        "timestamp": 1787873656516
+      },
+      {
+        "executionId": "09f6f07e-6993-495f-aa59-9498dd225326",
+        "chatSessionId": "sess_397f2a10-2054-4406-8aab-adb9311d9c8d",
+        "timestamp": 1787876797401
+      },
+      {
+        "executionId": "d80ed1e6-f40e-4807-ac81-0999b55a08ec",
+        "chatSessionId": "sess_397f2a10-2054-4406-8aab-adb9311d9c8d",
+        "timestamp": 1787954814751
+      }
+    ],
+    "2.5 Implement safety validation layer with rule-based checks": [
+      {
+        "executionId": "2aad7d61-c96e-4a16-afd6-895643676b8b",
+        "chatSessionId": "sess_397f2a10-2054-4406-8aab-adb9311d9c8d",
+        "timestamp": 1787873656544
+      },
+      {
+        "executionId": "09f6f07e-6993-495f-aa59-9498dd225326",
+        "chatSessionId": "sess_397f2a10-2054-4406-8aab-adb9311d9c8d",
+        "timestamp": 1787876798155
+      },
+      {
+        "executionId": "d80ed1e6-f40e-4807-ac81-0999b55a08ec",
+        "chatSessionId": "sess_397f2a10-2054-4406-8aab-adb9311d9c8d",
+        "timestamp": 1787954815440
+      }
+    ],
+    "3. Checkpoint - Test ML Core with sample patients": [
+      {
+        "executionId": "2aad7d61-c96e-4a16-afd6-895643676b8b",
+        "chatSessionId": "sess_397f2a10-2054-4406-8aab-adb9311d9c8d",
+        "timestamp": 1787873656568
+      }
+    ],
+    "4.1 Create single `app.py` with FastAPI application and Pydantic models": [
+      {
+        "executionId": "2aad7d61-c96e-4a16-afd6-895643676b8b",
+        "chatSessionId": "sess_397f2a10-2054-4406-8aab-adb9311d9c8d",
+        "timestamp": 1787873656593
+      },
+      {
+        "executionId": "2aad7d61-c96e-4a16-afd6-895643676b8b",
+        "chatSessionId": "sess_397f2a10-2054-4406-8aab-adb9311d9c8d",
+        "timestamp": 1787874356377
+      },
+      {
+        "executionId": "2aad7d61-c96e-4a16-afd6-895643676b8b",
+        "chatSessionId": "sess_397f2a10-2054-4406-8aab-adb9311d9c8d",
+        "timestamp": 1787876049687
+      }
+    ],
+    "4.2 Implement POST /api/v1/predict endpoint": [
+      {
+        "executionId": "2aad7d61-c96e-4a16-afd6-895643676b8b",
+        "chatSessionId": "sess_397f2a10-2054-4406-8aab-adb9311d9c8d",
+        "timestamp": 1787873656619
+      },
+      {
+        "executionId": "09f6f07e-6993-495f-aa59-9498dd225326",
+        "chatSessionId": "sess_397f2a10-2054-4406-8aab-adb9311d9c8d",
+        "timestamp": 1787876798845
+      },
+      {
+        "executionId": "d80ed1e6-f40e-4807-ac81-0999b55a08ec",
+        "chatSessionId": "sess_397f2a10-2054-4406-8aab-adb9311d9c8d",
+        "timestamp": 1787954830999
+      },
+      {
+        "executionId": "d80ed1e6-f40e-4807-ac81-0999b55a08ec",
+        "chatSessionId": "sess_397f2a10-2054-4406-8aab-adb9311d9c8d",
+        "timestamp": 1787954877805
+      },
+      {
+        "executionId": "08ea5d38-e77e-49c4-a512-a20567ae94cd",
+        "chatSessionId": "sess_397f2a10-2054-4406-8aab-adb9311d9c8d",
+        "timestamp": 1787994694371
+      }
+    ],
+    "4.3 Implement GET /api/v1/patients endpoint to serve test patients": [
+      {
+        "executionId": "2aad7d61-c96e-4a16-afd6-895643676b8b",
+        "chatSessionId": "sess_397f2a10-2054-4406-8aab-adb9311d9c8d",
+        "timestamp": 1787873656647
+      },
+      {
+        "executionId": "09f6f07e-6993-495f-aa59-9498dd225326",
+        "chatSessionId": "sess_397f2a10-2054-4406-8aab-adb9311d9c8d",
+        "timestamp": 1787876799705
+      },
+      {
+        "executionId": "d80ed1e6-f40e-4807-ac81-0999b55a08ec",
+        "chatSessionId": "sess_397f2a10-2054-4406-8aab-adb9311d9c8d",
+        "timestamp": 1787954832186
+      },
+      {
+        "executionId": "d80ed1e6-f40e-4807-ac81-0999b55a08ec",
+        "chatSessionId": "sess_397f2a10-2054-4406-8aab-adb9311d9c8d",
+        "timestamp": 1787954878584
+      },
+      {
+        "executionId": "08ea5d38-e77e-49c4-a512-a20567ae94cd",
+        "chatSessionId": "sess_397f2a10-2054-4406-8aab-adb9311d9c8d",
+        "timestamp": 1787994695130
+      }
+    ],
+    "4.4 Implement POST /api/v1/override endpoint to log clinician overrides": [
+      {
+        "executionId": "2aad7d61-c96e-4a16-afd6-895643676b8b",
+        "chatSessionId": "sess_397f2a10-2054-4406-8aab-adb9311d9c8d",
+        "timestamp": 1787873656675
+      },
+      {
+        "executionId": "08ea5d38-e77e-49c4-a512-a20567ae94cd",
+        "chatSessionId": "sess_397f2a10-2054-4406-8aab-adb9311d9c8d",
+        "timestamp": 1787994709254
+      },
+      {
+        "executionId": "c1a4c1b3-7f67-446b-bd8c-6d1b560f4156",
+        "chatSessionId": "sess_397f2a10-2054-4406-8aab-adb9311d9c8d",
+        "timestamp": 1787995369035
+      },
+      {
+        "executionId": "c1a4c1b3-7f67-446b-bd8c-6d1b560f4156",
+        "chatSessionId": "sess_397f2a10-2054-4406-8aab-adb9311d9c8d",
+        "timestamp": 1787995378523
+      },
+      {
+        "executionId": "c1a4c1b3-7f67-446b-bd8c-6d1b560f4156",
+        "chatSessionId": "sess_397f2a10-2054-4406-8aab-adb9311d9c8d",
+        "timestamp": 1787996099808
+      }
+    ],
+    "5.1 Create `frontend/index.html` with three main sections: patient intake form, ML recommendation panel, demo patient selector": [
+      {
+        "executionId": "2aad7d61-c96e-4a16-afd6-895643676b8b",
+        "chatSessionId": "sess_397f2a10-2054-4406-8aab-adb9311d9c8d",
+        "timestamp": 1787873656703
+      },
+      {
+        "executionId": "2aad7d61-c96e-4a16-afd6-895643676b8b",
+        "chatSessionId": "sess_397f2a10-2054-4406-8aab-adb9311d9c8d",
+        "timestamp": 1787876066082
+      },
+      {
+        "executionId": "d80ed1e6-f40e-4807-ac81-0999b55a08ec",
+        "chatSessionId": "sess_397f2a10-2054-4406-8aab-adb9311d9c8d",
+        "timestamp": 1787954869913
+      }
+    ],
+    "5.2 Implement patient intake form with validation": [
+      {
+        "executionId": "2aad7d61-c96e-4a16-afd6-895643676b8b",
+        "chatSessionId": "sess_397f2a10-2054-4406-8aab-adb9311d9c8d",
+        "timestamp": 1787873656730
+      },
+      {
+        "executionId": "d80ed1e6-f40e-4807-ac81-0999b55a08ec",
+        "chatSessionId": "sess_397f2a10-2054-4406-8aab-adb9311d9c8d",
+        "timestamp": 1787954879327
+      },
+      {
+        "executionId": "08ea5d38-e77e-49c4-a512-a20567ae94cd",
+        "chatSessionId": "sess_397f2a10-2054-4406-8aab-adb9311d9c8d",
+        "timestamp": 1787994695960
+      }
+    ],
+    "5.3 Implement ML recommendation panel with visualizations": [
+      {
+        "executionId": "2aad7d61-c96e-4a16-afd6-895643676b8b",
+        "chatSessionId": "sess_397f2a10-2054-4406-8aab-adb9311d9c8d",
+        "timestamp": 1787873656758
+      },
+      {
+        "executionId": "08ea5d38-e77e-49c4-a512-a20567ae94cd",
+        "chatSessionId": "sess_397f2a10-2054-4406-8aab-adb9311d9c8d",
+        "timestamp": 1787994710056
+      },
+      {
+        "executionId": "c1a4c1b3-7f67-446b-bd8c-6d1b560f4156",
+        "chatSessionId": "sess_397f2a10-2054-4406-8aab-adb9311d9c8d",
+        "timestamp": 1787995369823
+      },
+      {
+        "executionId": "d8bb72e6-e3e9-473a-894e-1ae0c28dc752",
+        "chatSessionId": "sess_397f2a10-2054-4406-8aab-adb9311d9c8d",
+        "timestamp": 1787996207337
+      },
+      {
+        "executionId": "d8bb72e6-e3e9-473a-894e-1ae0c28dc752",
+        "chatSessionId": "sess_397f2a10-2054-4406-8aab-adb9311d9c8d",
+        "timestamp": 1787999793687
+      }
+    ],
+    "5.4 Add override dialog modal": [
+      {
+        "executionId": "2aad7d61-c96e-4a16-afd6-895643676b8b",
+        "chatSessionId": "sess_397f2a10-2054-4406-8aab-adb9311d9c8d",
+        "timestamp": 1787873656784
+      },
+      {
+        "executionId": "08ea5d38-e77e-49c4-a512-a20567ae94cd",
+        "chatSessionId": "sess_397f2a10-2054-4406-8aab-adb9311d9c8d",
+        "timestamp": 1787994710696
+      },
+      {
+        "executionId": "c1a4c1b3-7f67-446b-bd8c-6d1b560f4156",
+        "chatSessionId": "sess_397f2a10-2054-4406-8aab-adb9311d9c8d",
+        "timestamp": 1787995370507
+      },
+      {
+        "executionId": "d8bb72e6-e3e9-473a-894e-1ae0c28dc752",
+        "chatSessionId": "sess_397f2a10-2054-4406-8aab-adb9311d9c8d",
+        "timestamp": 1787996208152
+      },
+      {
+        "executionId": "d8bb72e6-e3e9-473a-894e-1ae0c28dc752",
+        "chatSessionId": "sess_397f2a10-2054-4406-8aab-adb9311d9c8d",
+        "timestamp": 1787999810587
+      },
+      {
+        "executionId": "d8bb72e6-e3e9-473a-894e-1ae0c28dc752",
+        "chatSessionId": "sess_397f2a10-2054-4406-8aab-adb9311d9c8d",
+        "timestamp": 1787999810966
+      },
+      {
+        "executionId": "d8bb72e6-e3e9-473a-894e-1ae0c28dc752",
+        "chatSessionId": "sess_397f2a10-2054-4406-8aab-adb9311d9c8d",
+        "timestamp": 1788000378554
+      }
+    ],
+    "5.5 Implement demo patient quick-load functionality": [
+      {
+        "executionId": "2aad7d61-c96e-4a16-afd6-895643676b8b",
+        "chatSessionId": "sess_397f2a10-2054-4406-8aab-adb9311d9c8d",
+        "timestamp": 1787873656846
+      },
+      {
+        "executionId": "08ea5d38-e77e-49c4-a512-a20567ae94cd",
+        "chatSessionId": "sess_397f2a10-2054-4406-8aab-adb9311d9c8d",
+        "timestamp": 1787994711466
+      },
+      {
+        "executionId": "c1a4c1b3-7f67-446b-bd8c-6d1b560f4156",
+        "chatSessionId": "sess_397f2a10-2054-4406-8aab-adb9311d9c8d",
+        "timestamp": 1787995371322
+      },
+      {
+        "executionId": "d8bb72e6-e3e9-473a-894e-1ae0c28dc752",
+        "chatSessionId": "sess_397f2a10-2054-4406-8aab-adb9311d9c8d",
+        "timestamp": 1787996208619
+      },
+      {
+        "executionId": "d8bb72e6-e3e9-473a-894e-1ae0c28dc752",
+        "chatSessionId": "sess_397f2a10-2054-4406-8aab-adb9311d9c8d",
+        "timestamp": 1787999794345
+      }
+    ],
+    "6.1 Implement JavaScript fetch calls to backend": [
+      {
+        "executionId": "2aad7d61-c96e-4a16-afd6-895643676b8b",
+        "chatSessionId": "sess_397f2a10-2054-4406-8aab-adb9311d9c8d",
+        "timestamp": 1787873656870
+      },
+      {
+        "executionId": "d8bb72e6-e3e9-473a-894e-1ae0c28dc752",
+        "chatSessionId": "sess_397f2a10-2054-4406-8aab-adb9311d9c8d",
+        "timestamp": 1788000386730
+      }
+    ],
+    "6.2 Wire up form submission to display prediction results": [
+      {
+        "executionId": "2aad7d61-c96e-4a16-afd6-895643676b8b",
+        "chatSessionId": "sess_397f2a10-2054-4406-8aab-adb9311d9c8d",
+        "timestamp": 1787873656894
+      },
+      {
+        "executionId": "d8bb72e6-e3e9-473a-894e-1ae0c28dc752",
+        "chatSessionId": "sess_397f2a10-2054-4406-8aab-adb9311d9c8d",
+        "timestamp": 1788000387574
+      }
+    ],
+    "7.1 Add visual alerts for high-risk cases": [
+      {
+        "executionId": "2aad7d61-c96e-4a16-afd6-895643676b8b",
+        "chatSessionId": "sess_397f2a10-2054-4406-8aab-adb9311d9c8d",
+        "timestamp": 1787873656921
+      },
+      {
+        "executionId": "d8bb72e6-e3e9-473a-894e-1ae0c28dc752",
+        "chatSessionId": "sess_397f2a10-2054-4406-8aab-adb9311d9c8d",
+        "timestamp": 1788000388199
+      }
+    ],
+    "7.2 Add age-specific patient badges and helper text": [
+      {
+        "executionId": "2aad7d61-c96e-4a16-afd6-895643676b8b",
+        "chatSessionId": "sess_397f2a10-2054-4406-8aab-adb9311d9c8d",
+        "timestamp": 1787873656945
+      },
+      {
+        "executionId": "d8bb72e6-e3e9-473a-894e-1ae0c28dc752",
+        "chatSessionId": "sess_397f2a10-2054-4406-8aab-adb9311d9c8d",
+        "timestamp": 1788000389061
+      }
+    ],
+    "7.3 Create simple README with setup and demo instructions": [
+      {
+        "executionId": "2aad7d61-c96e-4a16-afd6-895643676b8b",
+        "chatSessionId": "sess_397f2a10-2054-4406-8aab-adb9311d9c8d",
+        "timestamp": 1787873656969
+      }
+    ],
+    "8.1 Test end-to-end flow with all 20 test patients": [
+      {
+        "executionId": "2aad7d61-c96e-4a16-afd6-895643676b8b",
+        "chatSessionId": "sess_397f2a10-2054-4406-8aab-adb9311d9c8d",
+        "timestamp": 1787873657004
+      }
+    ],
+    "8.2 Verify override logging and test error handling": [
+      {
+        "executionId": "2aad7d61-c96e-4a16-afd6-895643676b8b",
+        "chatSessionId": "sess_397f2a10-2054-4406-8aab-adb9311d9c8d",
+        "timestamp": 1787873657048
+      }
+    ],
+    "9. Checkpoint - Final validation": [
+      {
+        "executionId": "2aad7d61-c96e-4a16-afd6-895643676b8b",
+        "chatSessionId": "sess_397f2a10-2054-4406-8aab-adb9311d9c8d",
+        "timestamp": 1787873657073
+      }
+    ],
+    "2. Build simplified ML Core Engine": [
+      {
+        "executionId": "08ea5d38-e77e-49c4-a512-a20567ae94cd",
+        "chatSessionId": "sess_397f2a10-2054-4406-8aab-adb9311d9c8d",
+        "timestamp": 1787994693695
+      }
+    ],
+    "4. Build FastAPI backend with essential endpoints": [
+      {
+        "executionId": "c1a4c1b3-7f67-446b-bd8c-6d1b560f4156",
+        "chatSessionId": "sess_397f2a10-2054-4406-8aab-adb9311d9c8d",
+        "timestamp": 1787996099851
+      }
+    ],
+    "5. Build single-page web interface": [
+      {
+        "executionId": "d8bb72e6-e3e9-473a-894e-1ae0c28dc752",
+        "chatSessionId": "sess_397f2a10-2054-4406-8aab-adb9311d9c8d",
+        "timestamp": 1788000378613
+      }
+    ]
+  }
+}
